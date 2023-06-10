@@ -92,9 +92,9 @@ def strokeGroupSummary(gr, indent = 0):
 	return ret
 
 def characterSummary(c):
-	ret = "Character summary: %s (%s)" % (c.code, c.strokes.element)
+	ret = f"Character summary: {c.code} ({c.strokes.element})"
 	if c.variant:
-		ret += " - variant: %s" % (c.variant)
+		ret += f" - variant: {c.variant}"
 	ret += "\n"
 	ret += strokeGroupSummary(c.strokes)
 	return ret

@@ -44,7 +44,7 @@ def isKanji(v):
 
 # Returns the unicode of a character in a unicode string, taking surrogate pairs into account
 def realord(s, pos = 0):
-	if s == None: return None
+	if s is None: return None
 	code = ord(s[pos])
 	if code >= 0xD800 and code < 0xDC00:
 		if (len(s) <= pos + 1):
@@ -52,7 +52,7 @@ def realord(s, pos = 0):
 			return 0
 		code2 = ord(s[pos + 1])
 		if code2 >= 0xDC00 and code < 0xE000:
-			code = 0x10000 + ((code - 0xD800) << 10) + (code2 - 0xDC00)	
+			code = 0x10000 + ((code - 0xD800) << 10) + (code2 - 0xDC00)
 	return code
 
 def realchr(i):
@@ -74,15 +74,14 @@ class Kanji:
 	# String identifier used to uniquely identify the kanji
 	def kId(self):
 		ret = self.code
-		if self.variant: ret += "-%s" % (self.variant,)
+		if self.variant:
+			ret += f"-{self.variant}"
 		return ret
 
 	def outputStrokesNumbers(self, out, indent = 0):
 		strokes = self.getStrokes()
-		cpt = 1
-		for stroke in strokes:
+		for cpt, stroke in enumerate(strokes, start=1):
 			stroke.numberToSVG(out, cpt, indent + 1)
-			cpt += 1
 
 	def outputStrokes(self, out, indent = 0):
 		self.strokes.toSVG(out, self.kId(), [0], [1])
@@ -175,7 +174,7 @@ class StrokeGr:
 					newLevel = level
 					if found: newLevel += 1
 					childsComp += child.components(simplified, recursive, newLevel)
-		if recursive and not len(ret) == 0: ret = [ level ] + ret + childsComp
+		if recursive and ret: ret = [ level ] + ret + childsComp
 		return ret
 
 	def simplify(self):
@@ -359,13 +358,13 @@ class SVGHandler(BasicHandler):
 			elif idType == "kvg:StrokeNumbers":
 				return
 			else:
-				raise Exception("Invalid root group id type (%s)" % (str(attrs["id"]),))
+				raise Exception(f'Invalid root group id type ({str(attrs["id"])})')
 			self.currentKanji = Kanji(*idVariant)
 			self.kanjis[self.currentKanji.code] = self.currentKanji
 			self.compCpt = {}
 		else:
 			group.setParent(self.groups[-1])
-	
+
 		# Now parse group attributes
 		if "kvg:element" in attrs: group.element = unicode(attrs["kvg:element"])
 		if "kvg:variant" in attrs: group.variant = str(attrs["kvg:variant"])
@@ -385,27 +384,24 @@ class SVGHandler(BasicHandler):
 		if group.original: self.metComponents.add(group.original)
 
 		if group.number:
-			if not group.part: print("%s: Number specified, but part missing" % (self.currentKanji.kId()))
+			if not group.part:
+				print(f"{self.currentKanji.kId()}: Number specified, but part missing")
 			# The group must exist already
 			if group.part > 1:
 				if not self.compCpt.has_key(group.element + str(group.number)):
-					print("%s: Missing numbered group" % (self.currentKanji.kId()))
+					print(f"{self.currentKanji.kId()}: Missing numbered group")
 				elif self.compCpt[group.element + str(group.number)] != group.part - 1:
-					print("%s: Incorrectly numbered group" % (self.currentKanji.kId()))
-			# The group must not exist
-			else:
-				if self.compCpt.has_key(group.element + str(group.number)):
-					print("%s: Duplicate numbered group" % (self.currentKanji.kId()))
+					print(f"{self.currentKanji.kId()}: Incorrectly numbered group")
+			elif self.compCpt.has_key(group.element + str(group.number)):
+				print(f"{self.currentKanji.kId()}: Duplicate numbered group")
 			self.compCpt[group.element + str(group.number)] = group.part
-		# No number, just a part - groups restart with part 1, otherwise must
-		# increase correctly
 		elif group.part:
 				# The group must exist already
 			if group.part > 1:
 				if not self.compCpt.has_key(group.element):
-					print("%s: Incorrectly started multi-part group" % (self.currentKanji.kId()))
+					print(f"{self.currentKanji.kId()}: Incorrectly started multi-part group")
 				elif self.compCpt[group.element] != group.part - 1:
-					print("%s: Incorrectly splitted multi-part group" % (self.currentKanji.kId()))
+					print(f"{self.currentKanji.kId()}: Incorrectly splitted multi-part group")
 			self.compCpt[group.element] = group.part
 
 	def handle_end_g(self):
@@ -417,7 +413,6 @@ class SVGHandler(BasicHandler):
 			self.currentKanji.strokes = group
 			self.currentKanji = None
 			self.groups = []
-
 
 	def handle_start_path(self, attrs):
 		if len(self.groups) == 0: parent = None

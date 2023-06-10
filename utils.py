@@ -68,8 +68,8 @@ def readXmlFile(path, KanjisHandler=None):
         from kanjivg import KanjisHandler
     handler = KanjisHandler()
     parseXmlFile(path, handler)
-    parsed = list(handler.kanjis.values())
-    if len(parsed) == 0:
-        raise Exception("File does not contain any kanji entries. (%s)" % (path))
-    return handler.kanjis
+    if parsed := list(handler.kanjis.values()):
+        return handler.kanjis
+    else:
+        raise Exception(f"File does not contain any kanji entries. ({path})")
 

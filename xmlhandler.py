@@ -28,7 +28,7 @@ class BasicHandler(xml.sax.handler.ContentHandler):
 		
 	def startElement(self, qName, atts):
 		self.elementsTree.append(str(qName))
-		attrName = "handle_start_" + str(qName)
+		attrName = f"handle_start_{str(qName)}"
 		if hasattr(self, attrName):
 			rfunc = getattr(self, attrName)
 			rfunc(atts)
@@ -36,11 +36,11 @@ class BasicHandler(xml.sax.handler.ContentHandler):
 		return True
 	
 	def endElement(self, qName):
-		attrName = "handle_data_" + qName
+		attrName = f"handle_data_{qName}"
 		if hasattr(self, attrName):
 			rfunc = getattr(self, attrName)
 			rfunc(self.characters)
-		attrName = "handle_end_" + str(qName)
+		attrName = f"handle_end_{str(qName)}"
 		if hasattr(self, attrName):
 			rfunc = getattr(self, attrName)
 			rfunc()

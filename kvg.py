@@ -110,6 +110,6 @@ if __name__ == "__main__":
 	else:
 		for f in files:
 			if not os.path.exists(f):
-				print("%s does not exist!" % (f,))
+				print(f"{f} does not exist!")
 				continue
 			action(f)
