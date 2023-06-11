@@ -45,12 +45,12 @@ class SvgFileInfo:
 
     def read(self, SVGHandler=None):    
         if SVGHandler is None:
-            from kanjivg import SVGHandler 
+            from kanjivg import SVGHandler
         handler = SVGHandler()
         parseXmlFile(self.path, handler)
         parsed = list(handler.kanjis.values())
         if len(parsed) != 1:
-            raise Exception("File does not contain 1 kanji entry. (%s)" % (self.path))
+            raise Exception(f"File does not contain 1 kanji entry. ({self.path})")
         return parsed[0]
 
 def parseXmlFile(path, handler):

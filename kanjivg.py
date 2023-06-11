@@ -125,32 +125,22 @@ class StrokeGr:
 
 	def toSVG(self, out, rootId, groupCpt = [0], strCpt = [1], indent = 0):
 		gid = rootId
-		if groupCpt[0] != 0: gid += "-g" + str(groupCpt[0])
+		if groupCpt[0] != 0:
+			gid += f"-g{str(groupCpt[0])}"
 		groupCpt[0] += 1
 
-		idString = ' id="kvg:%s"' % (gid)
-		eltString = ""
-		if self.element: eltString = ' kvg:element="%s"' % (self.element)
-		variantString = ""
-		if self.variant: variantString = ' kvg:variant="true"'
-		partialString = ""
-		if self.partial: partialString = ' kvg:partial="true"'
-		origString = ""
-		if self.original: origString = ' kvg:original="%s"' % (self.original)
-		partString = ""
-		if self.part: partString = ' kvg:part="%d"' % (self.part)
-		numberString = ""
-		if self.number: numberString = ' kvg:number="%d"' % (self.number)
-		tradFormString = ""
-		if self.tradForm: tradFormString = ' kvg:tradForm="true"'
-		radicalFormString = ""
-		if self.radicalForm: radicalFormString = ' kvg:radicalForm="true"'
-		posString = ""
-		if self.position: posString = ' kvg:position="%s"' % (self.position)
-		radString = ""
-		if self.radical: radString = ' kvg:radical="%s"' % (self.radical)
-		phonString = ""
-		if self.phon: phonString = ' kvg:phon="%s"' % (self.phon)
+		idString = f' id="kvg:{gid}"'
+		eltString = f' kvg:element="{self.element}"' if self.element else ""
+		variantString = ' kvg:variant="true"' if self.variant else ""
+		partialString = ' kvg:partial="true"' if self.partial else ""
+		origString = f' kvg:original="{self.original}"' if self.original else ""
+		partString = ' kvg:part="%d"' % (self.part) if self.part else ""
+		numberString = ' kvg:number="%d"' % (self.number) if self.number else ""
+		tradFormString = ' kvg:tradForm="true"' if self.tradForm else ""
+		radicalFormString = ' kvg:radicalForm="true"' if self.radicalForm else ""
+		posString = f' kvg:position="{self.position}"' if self.position else ""
+		radString = f' kvg:radical="{self.radical}"' if self.radical else ""
+		phonString = f' kvg:phon="{self.phon}"' if self.phon else ""
 		out.write("\t" * indent + '<g%s%s%s%s%s%s%s%s%s%s%s%s>\n' % (idString, eltString, partString, numberString, variantString, origString, partialString, tradFormString, radicalFormString, posString, radString, phonString))
 
 		for child in self.childs:
@@ -300,27 +290,25 @@ class KanjisHandler(BasicHandler):
 		if group.original: self.metComponents.add(group.original)
 
 		if group.number:
-			if not group.part: print("%s: Number specified, but part missing" % (self.kanji.kId()))
+			if not group.part:
+				print(f"{self.kanji.kId()}: Number specified, but part missing")
 			# The group must exist already
 			if group.part > 1:
 				if (group.element + str(group.number)) not in self.compCpt:
-					print("%s: Missing numbered group" % (self.kanji.kId()))
+					print(f"{self.kanji.kId()}: Missing numbered group")
 				elif self.compCpt[group.element + str(group.number)] != group.part - 1:
-					print("%s: Incorrectly numbered group" % (self.kanji.kId()))
-			# The group must not exist
-			else:
-				if (group.element + str(group.number)) in self.compCpt:
-					print("%s: Duplicate numbered group" % (self.kanji.kId()))
+					print(f"{self.kanji.kId()}: Incorrectly numbered group")
+			elif (group.element + str(group.number)) in self.compCpt:
+				print(f"{self.kanji.kId()}: Duplicate numbered group")
 			self.compCpt[group.element + str(group.number)] = group.part
-		# No number, just a part - groups restart with part 1, otherwise must
-		# increase correctly
 		elif group.part:
 				# The group must exist already
-			if group.part > 1:
-				if group.element not in self.compCpt:
-					print("%s: Incorrectly started multi-part group" % (self.kanji.kId()))
-				elif self.compCpt[group.element] != group.part - 1:
-					print("%s: Incorrectly splitted multi-part group" % (self.kanji.kId()))
+			if group.element not in self.compCpt:
+				if group.part > 1:
+					print(f"{self.kanji.kId()}: Incorrectly started multi-part group")
+			elif self.compCpt[group.element] != group.part - 1:
+				if group.part > 1:
+					print(f"{self.kanji.kId()}: Incorrectly splitted multi-part group")
 			self.compCpt[group.element] = group.part
 
 	def handle_end_g(self):
@@ -388,17 +376,17 @@ class SVGHandler(BasicHandler):
 				print(f"{self.currentKanji.kId()}: Number specified, but part missing")
 			# The group must exist already
 			if group.part > 1:
-				if not self.compCpt.has_key(group.element + str(group.number)):
+				if group.element + str(group.number) not in self.compCpt:
 					print(f"{self.currentKanji.kId()}: Missing numbered group")
 				elif self.compCpt[group.element + str(group.number)] != group.part - 1:
 					print(f"{self.currentKanji.kId()}: Incorrectly numbered group")
-			elif self.compCpt.has_key(group.element + str(group.number)):
+			elif (group.element + str(group.number)) in self.compCpt:
 				print(f"{self.currentKanji.kId()}: Duplicate numbered group")
 			self.compCpt[group.element + str(group.number)] = group.part
 		elif group.part:
 				# The group must exist already
 			if group.part > 1:
-				if not self.compCpt.has_key(group.element):
+				if group.element not in self.compCpt:
 					print(f"{self.currentKanji.kId()}: Incorrectly started multi-part group")
 				elif self.compCpt[group.element] != group.part - 1:
 					print(f"{self.currentKanji.kId()}: Incorrectly splitted multi-part group")
@@ -415,8 +403,7 @@ class SVGHandler(BasicHandler):
 			self.groups = []
 
 	def handle_start_path(self, attrs):
-		if len(self.groups) == 0: parent = None
-		else: parent = self.groups[-1]
+		parent = None if len(self.groups) == 0 else self.groups[-1]
 		stroke = Stroke(parent)
 		if "kvg:type" in attrs:
 			stroke.stype = unicode(attrs["kvg:type"])
