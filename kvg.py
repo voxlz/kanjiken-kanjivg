@@ -31,19 +31,17 @@ Recognized commands:
 def createPathsSVG(f):
 	s = open(f, "r", encoding="utf-8").read()
 	paths = pathre.findall(s)
-	out = open(f[:-4] + "-paths.svg", "w", encoding="utf-8")
+	out = open(f"{f[:-4]}-paths.svg", "w", encoding="utf-8")
 	out.write("""<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd" []>
 <svg xmlns="http://www.w3.org/2000/svg" width="109" height="109" viewBox="0 0 109 109" style="fill:none;stroke:#000000;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;">\n""")
-	i = 1
-	for path in paths:
+	for i, path in enumerate(paths, start=1):
 		out.write('<!--%2d--><path d="%s"/>\n' % (i, path))
-		i += 1
 	out.write("</svg>")
 
 def mergePathsSVG(f):
-	pFile = f[:-4] + "-paths.svg"
+	pFile = f"{f[:-4]}-paths.svg"
 	if not os.path.exists(pFile):
-		print("%s does not exist!" % (pFile,))
+		print(f"{pFile} does not exist!")
 		return
 	s = open(pFile, "r", encoding="utf-8").read()
 	paths = pathre.findall(s)
@@ -52,7 +50,7 @@ def mergePathsSVG(f):
 	while True:
 		match = pathre.search(s[pos:])
 		if match and len(paths) == 0 or not match and len(paths) > 0:
-			print("Paths count mismatch for %s" % (f,))
+			print(f"Paths count mismatch for {f}")
 			return
 		if not match and len(paths) == 0:
 			break
@@ -65,13 +63,17 @@ def release():
 	datadir = "kanji"
 	idMatchString = "<g id=\"kvg:StrokePaths_"
 	allfiles = os.listdir(datadir)
-	files = []
-	for f in allfiles:
-		if len(f) == 9: files.append(f)
+	files = [f for f in allfiles if len(f) == 9]
 	del allfiles
 	files.sort()
-	
-	out = open("kanjivg.xml", "w", encoding='utf8')
+
+	with open("kanjivg.xml", "w", encoding='utf8') as out:
+		_extracted_from_release_(out, files, datadir, idMatchString)
+	print("%d kanji emitted" % len(files))
+
+
+# TODO Rename this here and in `release`
+def _extracted_from_release_(out, files, datadir, idMatchString):
 	out.write('<?xml version="1.0" encoding="UTF-8"?>\n')
 	out.write("<!--\n")
 	out.write(licenseString)
@@ -87,8 +89,6 @@ def release():
 		data = "<kanji id=\"kvg:kanji_%s\">" % (data[:kidend],) + data[data.find("\n"):data.find('<g id="kvg:StrokeNumbers_') - 5] + "</kanji>\n"
 		out.write(data)
 	out.write("</kanjivg>\n")
-	out.close()
-	print("%d kanji emitted" % len(files))
 
 actions = {
 	"split": (createPathsSVG, 2),
