@@ -1,17 +1,17 @@
 import unittest
 
-from my_code.kanjivg_utils import comps_from_tree, get_comp_list, load_kanji, reduce_tree
+from my_code.kanjivg_utils import comps_from_tree, get_comp_list_recursive, load_kanji, reduce_comps_recursive
 
 class TestCompTree(unittest.TestCase):
     def get_kanji_comps(self, kanji):
-        kanji_tree = self.get_kanji_comp_tree(kanji)
-        return comps_from_tree(kanji_tree[kanji])
+        comp_list = self.get_kanji_comp_tree(kanji)
+        return comps_from_tree(comp_list)
 
     def get_kanji_comp_tree(self, kanji):
-        kanji_obj  = load_kanji(kanji)
-        kanji_tree = get_comp_list(kanji_obj)
-        kanji_tree, _ = reduce_tree([{kanji: kanji_tree}])
-        return kanji_tree
+        kanji_obj = load_kanji(kanji)
+        comp_list = get_comp_list_recursive(kanji_obj)
+        comp_list = reduce_comps_recursive(comp_list)
+        return comp_list
 
     def test_形(self):
         comps = self.get_kanji_comps('形')
@@ -41,17 +41,31 @@ class TestCompTree(unittest.TestCase):
         comps = self.get_kanji_comps('鹿')
         self.assertEqual(['⼴', '㇕', 'ᚇ', '比'], comps)
         
-    def test_鹿(self):
-        comps = self.get_kanji_comps('駦')
-        self.assertEqual(['⼴', '㇕', 'ᚇ', '比'], comps)
+    # def test_駦(self):
+    #     comps = self.get_kanji_comps('駦')
+    #     self.assertEqual(['⼴', '㇕', 'ᚇ', '比'], comps)
     
     def test_咼(self):
         comps = self.get_kanji_comps('咼')
-        self.assertEqual(['⨅', '㇑', '㇐', '⼌', '口'], comps)
+        self.assertEqual(['⨅', '㇑', '一', '⼌', '口'], comps)
     
     def test_良(self):
         tree = self.get_kanji_comps('良')
-        self.assertEqual(['㇑', '艮'], tree)
+        self.assertEqual(['㇔', '⾉'], tree)
+    
+    def test_繊(self):
+        tree = self.get_kanji_comps('繊')
+        self.assertEqual(['糸', '土', '业', '㇂', '冫'], tree)
+    
+    def test_卵(self):
+        # Box radical wrong stroke order
+        tree = self.get_kanji_comps('卵')
+        self.assertEqual(['⼕', 'ン', '㇆', '丶', '㇑'], tree)
+    
+    def test_a1(self):
+        # Box radical wrong stroke order
+        tree = self.get_kanji_comps('籠')
+        self.assertEqual(['𥫗', '立', '月', '⺊', '己', '三'], tree)
     
     # def test_huh(self):
     #     comps = self.get_kanji_comps('⾉')
@@ -61,8 +75,6 @@ class TestCompTree(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-    
-    
     
 
 # lookup = kanji in get_valid_kanji()

@@ -39,3 +39,16 @@ Let's talk about some principles I'm going for here.
 ### Avoid mismatch strokes and unicode representations
 
 Variants and Original characters. If it's a variant but has no original character, that means there is no proper unicode representation of the component, which is undesirable. Like 滕 with the top strokes leaning inward like 𣳾.
+
+### Custom radicals
+
+I have invented new radicals. This was due to not finding a good reduction of strokes with the available unicode characters.
+
+* ⿖ (amongus, 4 comps) : part of  薦,  鹿
+* ⿗ (drag-on, 5 comps) : part of 龍
+
+### Shin(j)i(tai) kanji
+
+Kanji where joyo is using old radical / version of kanji compared to shinjitai (extended).
+
+* 籠 Jōyō -> 篭 shinjitai

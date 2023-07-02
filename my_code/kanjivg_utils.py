@@ -15,24 +15,67 @@ def load_kanji(kanji):
         
     return kanji_info.strokes
 
-def get_comp_list(kanji_obj):
-    ''' Recursively creates a tree of components for a kanji. Returns an 
-    list of components. '''
+def check_for_stroke(kanji_obj):
+    ''' Check if the kanji_obj is a stroke. '''
+    isStroke = False
+    stroke = None
+    
+    # Stroke is the innermost element, return it as is
+    if type(kanji_obj) is Stroke:
+        stroke = f"{to_homoglyph(kanji_obj.stype[0])}"
+        isStroke = True
+    elif to_homoglyph(kanji_obj.element) in get_strokes():
+        stroke = f"{kanji_obj.element}"
+        isStroke = True
+    
+    return isStroke, stroke
+
+def get_comp_list(kanji_obj, depth = 0, joyo = False):
+    ''' Recursively move down the tree until you find a joyo kanji, radical or stroke. Returns a list of components.
+    '''
+    
+    # Stroke is the innermost element, return it as is
+    isStroke, stroke = check_for_stroke(kanji_obj)
+    if isStroke: return [stroke]
+        
+
+    isComplete = kanji_obj.part is None
+    element = to_homoglyph(kanji_obj.element)
+    
+    if (depth != 0 and isComplete):
+        isRadical   = element in get_radicals()
+        isKanji     = element in get_valid_kanji()
+        
+        if isKanji or (isRadical and not joyo):
+            return [element]
+        
+        # NOTE: kanji_obj.original
+        # Using the kanji_obj.original might reduce the number 
+        # of radicals to learn, however:
+        # - Original character is not necessary a joyo kanji.
+        # - May have different stroke order / strokes amount, confusing learners.
+    
+    result = []
+    for child in kanji_obj.childs:
+        result.extend(get_comp_list(child, depth + 1, joyo))
+    return result
+
+def get_comp_list_recursive(kanji_obj):
+    ''' Recursively creates an list of components for a kanji. '''
 
     result = []
     for child in kanji_obj.childs:
         child_comps = Tree()
         
         # Stroke is the innermost element, return it as is
-        if type(child) is Stroke:
-            result.append(f"{child.stype[0]}")
-            continue
-        elif (element := to_homoglyph(child.element)) in get_strokes():
-            result.append(f"{element}")
+        isStroke, stroke = check_for_stroke(child)
+        if isStroke: 
+            result.append(stroke)
             continue
         
-        comp_tree    = get_comp_list(child)
-        
+        comp_tree    = get_comp_list_recursive(child)
+        element      = to_homoglyph(child.element)
+
         # Some things must be true for the element to be valid
         isExistent   = element is not None
         isComplete   = child.part is None
@@ -50,9 +93,10 @@ def get_comp_list(kanji_obj):
         # isRadical    = child.radical is not None
         # isUNICODE    = not (isVariant and isOriginal) 
         
-        if not (isCOMPLETE and isKANJI) and element is not None and kanji_obj.element is not None and isComplete:
-            print(f"Skipping {element} from {kanji_obj.element}")
+        # if not (isCOMPLETE and isKANJI) and element is not None and kanji_obj.element is not None and isComplete:
+        #     print(f"Skipping {element} from {kanji_obj.element}")
         
+        # If valid, add current element to the list of components
         if isCOMPLETE and (isKANJI):
             child_comps[element] = comp_tree
             result.append(child_comps)
@@ -67,11 +111,8 @@ def comps_from_tree(comp_tree):
     
     return list(map(lambda x: x if type(x) is str else list(x.keys())[0], comp_tree))
 
-reduced_tree      = Tree() # Reduced tree
-reduced_chars     = Tree() # Most reduced {kanji: {comp: [components], from: 'char'}}
-
-def get_lvl_str(comp_tree):
-    ''' Get the top most string representation of a component tree. '''
+def get_direct_components(comp_tree):
+    ''' Get the direct child components from component tree. '''
     rtn = []
     # Either recursive tree or a stroke string
     for char in comp_tree:
@@ -79,84 +120,84 @@ def get_lvl_str(comp_tree):
             rtn.append(char)
         else:
             rtn.append(list(char.keys())[0])
-    return ",".join(rtn)
+    return rtn
 
-def reduce_tree(tree_list, depth = 0, from_char = None):
-    ''' Recursively reduce a tree of components. '''
+def get_lvl_str(comp_tree):
+    ''' Get the top most string representation of a component tree. '''
     
-    org_char = from_char
+    return ",".join(get_direct_components(comp_tree))
 
-    # Assuming list with single component tree
-    for char, comp_tree in tree_list[0].items():
+def reduce_comps_recursive(comp_list, from_char = None):
+    ''' Recursively reduce a list of components. '''
+        
+    # Apply applicable reduction rules to comp_list
+    for rule, result in get_rules():
 
-        # Set current character
-        if org_char is None:
-            from_char = char
+        # Skip if rule is not a reduction
+        if (result == from_char): continue 
 
-        # Apply applicable reduction rules on char
-        for rule, result in get_rules():
+        # Replace if rule is a reduction
+        lvl_comps_str = get_lvl_str(comp_list)
+        while (str_index := lvl_comps_str.find(rule)) != -1:
+            itm_index = lvl_comps_str.count(',', 0, str_index)
+            rule_len = rule.count(',') + 1
+            sliced = slice(itm_index,itm_index+rule_len)
+            comp_list[sliced] = [{result: comp_list[sliced]}]
+            lvl_comps_str = get_lvl_str(comp_list)
 
-            # Skip if rule is not a reduction
-            if (result == char): continue 
+    # Recursively go down the component tree
+    for i, comp in enumerate(comp_list):
+        if type(comp) is str:
+            continue
+        for char, comp_tree in comp.items():
+            comp_list[i] = {char: reduce_comps_recursive(comp_tree, char)}
 
-            # Replace if rule is a reduction
-            lvl_comps_str = get_lvl_str(comp_tree)
-            while (str_index := lvl_comps_str.find(rule)) != -1:
-                itm_index = lvl_comps_str.count(',', 0, str_index)
-                rule_len = rule.count(',') + 1
-                sliced = slice(itm_index,itm_index+rule_len)
-                comp_tree[sliced] = [{result: comp_tree[sliced]}]
-                lvl_comps_str = get_lvl_str(comp_tree)
 
-        # Recursively reduce the tree
-        reduced_comps = []
-        for comp in comp_tree:
-            if type(comp) is str:
-                reduced_comps.append(comp)
+    return comp_list
+
+def count_occurrences(comps_recursive, char_dict, kanji):
+    ''' Recursively find and count all components in a kanji. '''
+    
+    # Recursively go down the component tree
+    for comp in comps_recursive:
+        if type(comp) is str:
+            char = comp
+            if char in char_dict:
+                update = {
+                    'occur': char_dict[char]['occur'] + 1,
+                    'derived': char_dict[char]['derived'] | {kanji}
+                }
+                char_dict[char] = char_dict[char] | update
             else:
-                char_key = list(comp.keys())[0]
-                reduced_comps.append({char_key: reduce_tree([comp], depth + 1, from_char if from_char is not None else char_key)})
-
-        # Save the tree
-        if depth == 0:
-            reduced_tree[char] = reduced_comps
-
-        # Save most reduced form of a character
-        if char in reduced_chars:
-            if len(reduced_chars[char]['comps']) > len(reduced_comps):
-                reduced_chars[char] = {'comps': reduced_comps, 'from': from_char}
+                char_dict[char] = {
+                    'comps'  : None,   # The components of the character
+                    'from'   : kanji,  # Character that this component is originally from
+                    'joyo'   : False,  # Whether this character is a joyo kanji
+                    'occur'  : 1,      # How often this char occurs as a comp, including itself
+                    'n_comps': 0,
+                    'derived': {kanji}, # Kanji 
+                }
         else:
-            reduced_chars[char] = {'comps': reduced_comps, 'from': from_char}
+            char = list(comp.keys())[0]
+            if char in char_dict:
+                update = {
+                    'occur': char_dict[char]['occur'] + 1,
+                    'derived': char_dict[char]['derived'] | {kanji}
+                }
+                char_dict[char] = char_dict[char] | update
+            else:
+                comps = get_direct_components(comp[char])
+                char_dict[char] = {
+                    'comps'  : comps, # The components of the character
+                    'from'   : kanji,      # Character that this component is originally from
+                    'joyo'   : False,      # Whether this character is a joyo kanji
+                    'occur'  : 1,          # How often this char occurs as a comp, including itself
+                    'n_comps': len(comp[char]),
+                    'derived': {kanji}, # Kanji 
+                }
+            
+            # Recursively count occurrences of this component
 
-    return (reduced_tree, reduced_chars) if depth == 0 else reduced_comps
-
-def get_components(kanji_obj, depth = 0, joyo = True):
-    ''' Recursively move down the tree until you find a joyo kanji, radical or stroke. Returns a list of components.
-    '''
+            count_occurrences(comp[char], char_dict, kanji)
     
-    # If we have reached a stroke without hitting a kanji, return the stroke
-    if type(kanji_obj) is Stroke:
-        return [f"{kanji_obj.stype[0]}*"] # stroke typically (type, connection)
-
-    # Unless we are at the top level, we want to add the current kanji to the list of parts
-    isComplete = kanji_obj.part is None
-    # isPartial =  kanji_obj.partial == "true"
-
-    if (depth != 0 and isComplete):
-        elem = to_homoglyph(kanji_obj.element)
-        isRadical   = elem in get_radicals()
-        isKanji     = elem in get_valid_kanji()
-        
-        if isKanji or (isRadical and not joyo):
-            return [elem]
-        
-        # NOTE: kanji_obj.original
-        # Using the kanji_obj.original might reduce the number 
-        # of radicals to learn, however:
-        # - Original character is not necessary a joyo kanji.
-        # - May have different stroke order / strokes amount, confusing learners.
-    
-    result = []
-    for child in kanji_obj.childs:
-        result.extend(get_components(child, depth + 1, joyo))
-    return result
+    return char_dict

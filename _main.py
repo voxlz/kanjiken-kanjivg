@@ -1,13 +1,14 @@
 ## An attempt to create a dependency tree including all JoYo kanji based on their parts.
 from typing import List
 from my_code.kanji import get_jinmeiyo_kanji, get_joyo_kanji, get_valid_kanji
-from my_code.kanjivg_utils import get_comp_list, get_components, load_kanji, reduce_tree
+from my_code.kanjivg_utils import count_occurrences, get_comp_list_recursive, get_comp_list, load_kanji, reduce_comps_recursive
 from my_code.radicals import get_radicals, get_strokes
+from my_code.reduction import get_rules
 from my_code.tree import Tree
 from my_code.unicode import to_homoglyph
 
 # Program limits
-max_comps = 5 # how many kanji parts to allow in UI for a single kanji
+max_comps = 6 # how many kanji parts to allow in UI for a single kanji
 
 # List of radicals to accept to reduce the number of components a kanji can have. Let's say... 8 components max.
 radicals_8 = []
@@ -37,14 +38,11 @@ jinmeiyo    = remove_duplicates(get_jinmeiyo_kanji(), 'jinmeiyo')
 assert radicals.isdisjoint(joyo)
 assert joyo.isdisjoint(jinmeiyo)
 assert radicals.isdisjoint(jinmeiyo)
-
-
-
     
 def reduce_parts(strokes: List[str]):
     # '醸' = ['酉', '六', '一', '㇑*', '㇑*', '一', '一', '㇒*', '㇙*', '㇒*', '㇏*'] => ['酉', '六', '一', '㇑*', '㇑*', '二', '𧘇']
     strokes_str = ','.join(strokes)
-    for (match, result) in reduction_rules:
+    for (match, result) in get_rules():
         
         if match in strokes_str:
             # if match not in ['㇐*','㇑*']: 
@@ -55,93 +53,46 @@ def reduce_parts(strokes: List[str]):
     return list(filter(lambda c: c, strokes_str.split(',')))
 
 # Look up all joyo kanji in the kanji-svg database
-kanji_parts = {}
-kanji_dict = {}
-joyo_tree = {}
+char_dict = {} # All joyo kanji and their components 
 
-
-for kanji in ['臣', '形' ]:
-    kanji_obj = load_kanji(kanji)
-    kanji = kanji_obj.element
-    
-    comps = get_components(kanji_obj, joyo = False)
-    comp_tree = get_comp_list(kanji_obj)
-    comp_with_radicals = reduce_parts(comps)
-
-    # if random.randint(0, 100) == 0:
-    #     print()
-    joyo_tree[kanji] = comp_tree
-    kanji_parts[kanji] = comp_with_radicals
-    kanji_dict[kanji] = {
-        'comp_kanji': [k for k in comp_with_radicals if k in get_valid_kanji()],
-        'comp_kanji&radicals': comp_with_radicals, # Kanji, radicals and strokes
-        'comp_kanji&strokes': comp_with_radicals, # Only kanji and strokes
-        'comp_preferred': comp_with_radicals,
+# Create a base dictionary of all joyo kanji
+for char in joyo:
+    kanji_obj = load_kanji(char)
+    comps = get_comp_list(kanji_obj)
+    comps = reduce_parts(comps)
+    char_dict[char] = {
+        'comps'  : comps,      # The components of the character
+        'from'   : char,      # Character that this component is originally from
+        'joyo'   : True,       # Whether this character is a joyo kanji
+        'occur'  : 1,          # How often this char occurs as a comp, including itself
+        'n_comps': len(comps),
+        'derived': set(),        # Kanji this character occurs in
     }
-    # print(comp_elems)
 
-reduce_tree([joyo_tree])
+# Loop through all kanji and their components, adding not-yet-encountered components to the dictionary, counting occurrences along the way
+for char in joyo:
+    kanji_obj = load_kanji(char)
+    comps     = get_comp_list_recursive(kanji_obj)
+    comps     = reduce_comps_recursive(comps, from_char=char)
+    char_dict = count_occurrences(comps, char_dict, char)
 
-print()
-
-# Calculate a dependency tree for each kanji
-for kanji in kanji_parts:
-    # if kanji == "楼":
-    #     print(f"{kanji} has {len(parts)} parts")
-
-    kanji_dict[kanji] = {
-        'part_of': [parent for parent, p_parts in kanji_parts.items() if kanji in p_parts],
-    } | kanji_dict[kanji]
-
-    print(f"{kanji} part of {kanji_dict[kanji]['part_of']}, contains {kanji_dict[kanji]['comp_preferred']}")
-
-print()
-print()
-print()
-print()
 # How many have more than 'max_comps' components?
-radical_comps = [
-    (
-        kanji,
-        kanji_dict[kanji]['comp_preferred'],
-        len(kanji_dict[kanji]['comp_preferred']),
-    )
-    for kanji in joyo
-]
-above_x_comps = list(filter(lambda x: x[2] > max_comps, radical_comps))
+above_x_comps = [(char, info) for char, info in char_dict.items() if info['n_comps'] > max_comps]
 print(f"More than {max_comps} components: {len(above_x_comps)}")
-for kanji, comps, num_comps in above_x_comps:
-    print(f"{kanji} has {num_comps} components: {comps}")
+for (char, info) in above_x_comps:
+    print(f"{char} has {info['n_comps']} components: {info['comps']}")
 
-
-# # Goal: Minimize components. Going through joyo tree, note down all encountered characters, and save their most reduced form.
-# def find_most_reduced_form(list_of_chars):
-#     ''' Recursively find the most reduced form of a tree of components. Input [{}]. '''
-    
-#     most_reduced = Tree()
-    
-#     for chars in list_of_chars:
-#         for (char, comps) in chars.items():
-#             print()
-    
-#     return most_reduced
-
-# find_most_reduced_form([joyo_tree])
-
-
-# Ideally we want to minimize the amount of radicals the user will have to learn, since they are not kanji themselves.
 # given 'max_comps', how many radicals will the user encounter?
 seen_strokes = set()
 seen_radicals = set()
 seen_other = set()
 seen_name_kanji = set()
-seen_components = 0
-for kanji in joyo:
-    seen_components += len(kanji_dict[kanji]['comp_preferred'])
-    for part in kanji_dict[kanji]['comp_preferred']:
+seen_components = len(char_dict)
+for char in joyo:
+    for part in char_dict[char]['comps']:
         if part not in joyo:
-            if '*' in part: 
-                seen_strokes.add(part[:-1])
+            if part in strokes: 
+                seen_strokes.add(part)
             elif part in radicals:
                 seen_radicals.add(part)
             elif part in jinmeiyo:
@@ -160,5 +111,13 @@ print(seen_other)
 print(f"User will encounter {seen_components} components")
 print(len(joyo))
 
+# I want consistency in my kanji components. The same kanji should always be represented by the same components. I cannot trust that kanjivg has done this for me, especially since I've edited some kanji, so I will have to do it myself. Therefore I require a dictionary of all kanji + radicals -> most reduced form. It should be based primarily on the corresponding kanjivg entry, and if not present in joyo but part of another kanji, then the most reduced form of that kanji should also be added.
+a = char_dict['丶']
+print()
+
+
 # Most repeated component in a kanji? 
 # 傘 has 6 components: ['人', '人', '人', '人', '人', '十']
+
+# Most strokes in a joyo kanji? 
+# 鬱 has 29 strokes
