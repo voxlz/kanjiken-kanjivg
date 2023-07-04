@@ -1,9 +1,9 @@
 import csv
 
 
-kangxi_radicals = set()
 def get_radicals():
     '''Returns a list of all radicals'''
+    kangxi_radicals = set()
     
     # If already in memory, use that.
     if kangxi_radicals != set(): 
@@ -16,6 +16,9 @@ def get_radicals():
             if "#" in row[0]: continue # Skip if comment
             radical = row[0]
             kangxi_radicals.add(radical)
+    
+        # Add my custom radicals
+        kangxi_radicals = kangxi_radicals.union({'⿗', '⿖'} )
             
     return kangxi_radicals
 

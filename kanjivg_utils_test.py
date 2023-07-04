@@ -3,7 +3,7 @@
 import unittest
 from kanjivg import Stroke
 
-from my_code.kanjivg_utils import check_for_stroke, comps_from_tree, get_comp_list_recursive, load_kanji, reduce_comps_recursive
+from my_code.kanjivg_utils import check_for_stroke, comps_from_tree, get_comp_list_recursive, load_kanji, reduce_comps
 
 class TestUtils(unittest.TestCase):
 
@@ -15,9 +15,16 @@ class TestUtils(unittest.TestCase):
         isStroke, stroke = check_for_stroke(kanji_obj)
         self.assertEqual(isStroke, True)
         self.assertEqual(stroke, '㇔')
+    
+    # Make sure it does not reduce itself
+    def test_reduce_self(self):
+        char  = '十'
+        kanji_obj = load_kanji(char)
+        comps = get_comp_list_recursive(kanji_obj)
+        comps = reduce_comps(comps, char)
+        self.assertEqual(comps, ['一', '㇑'])
         
         
-
 
 if __name__ == '__main__':
     unittest.main()

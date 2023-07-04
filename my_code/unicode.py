@@ -29,8 +29,8 @@ def to_homoglyph(char):
     ''' Convert characters to the preferred default homoglyph unicode representation. This is needed as some radicals have multiple unicode representations. 
     
     The preferred order goes like this:
-    1. Joyo Kanji
-    2. Stokes (not always encoded as Stroke type)
+    1. Stokes (first to ensure '一' encodes properly)
+    2. Joyo Kanji
     3. Radicals
     4. Jinmeiyo Kanji 
     '''
@@ -40,8 +40,8 @@ def to_homoglyph(char):
         with open("my_files/homoglyphs.csv", "r", encoding="utf8") as mapping:
             reader = csv.reader(mapping, delimiter=",")
 
-            joyo = get_joyo_kanji()
             strokes = get_strokes()
+            joyo = get_joyo_kanji()
             radicals = get_radicals()
             jinmeiyo = get_jinmeiyo_kanji()
 
@@ -52,8 +52,8 @@ def to_homoglyph(char):
                 prefer = None # Preferred representation
 
                 # Check for joyo chars
-                prefer = find_in_char_set(joyo, row, prefer)
                 prefer = find_in_char_set(strokes, row, prefer)
+                prefer = find_in_char_set(joyo, row, prefer)
                 prefer = find_in_char_set(radicals, row, prefer)
                 prefer = find_in_char_set(jinmeiyo, row, prefer)
 

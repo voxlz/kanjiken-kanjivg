@@ -5,6 +5,10 @@ from my_code.reduction import get_rules
 from my_code.tree import Tree
 from my_code.unicode import to_homoglyph
 from utils import canonicalId, listSvgFiles
+from difflib import SequenceMatcher
+
+def similar(a, b):
+    return SequenceMatcher(None, a, b).ratio()
 
 svg_file_list = listSvgFiles("./kanji/")
 
@@ -29,7 +33,7 @@ def check_for_stroke(kanji_obj):
     
     return isStroke, stroke
 
-def get_comp_list(kanji_obj, depth = 0, joyo = False):
+def get_comp_list(kanji_obj, depth = 0):
     ''' Recursively move down the tree until you find a joyo kanji, radical or stroke. Returns a list of components.
     '''
     
@@ -44,18 +48,12 @@ def get_comp_list(kanji_obj, depth = 0, joyo = False):
         isRadical   = element in get_radicals()
         isKanji     = element in get_valid_kanji()
         
-        if isKanji or (isRadical and not joyo):
+        if isKanji or isRadical:
             return [element]
-        
-        # NOTE: kanji_obj.original
-        # Using the kanji_obj.original might reduce the number 
-        # of radicals to learn, however:
-        # - Original character is not necessary a joyo kanji.
-        # - May have different stroke order / strokes amount, confusing learners.
     
     result = []
     for child in kanji_obj.childs:
-        result.extend(get_comp_list(child, depth + 1, joyo))
+        result.extend(get_comp_list(child, depth + 1))
     return result
 
 def get_comp_list_recursive(kanji_obj):
@@ -109,8 +107,9 @@ def comps_from_tree(comp_tree):
     
     return list(map(lambda x: x if type(x) is str else list(x.keys())[0], comp_tree))
 
-def get_direct_components(comp_tree):
+def simplify_comp_list(comp_tree):
     ''' Get the direct child components from component tree. '''
+    
     rtn = []
     # Either recursive tree or a stroke string
     for char in comp_tree:
@@ -120,19 +119,53 @@ def get_direct_components(comp_tree):
             rtn.append(list(char.keys())[0])
     return rtn
 
+def expand_comps(comps, char_dict):
+    ''' Takes a simplified comps list and expands it using char_dict. '''
+    
+    rtn = []
+    # Either recursive tree or a stroke string
+    for char in comps:
+        if char in char_dict:
+            if (char_comp := char_dict[char]['comps']) is None:
+                rtn.append(char)
+            else:
+                rtn.append({char: expand_comps(char_comp, char_dict)})
+    return rtn
+
+def get_strokes_from_comps(comps):
+    ''' '''
+    rtn = []
+    for char in comps:
+        if type(char) is str:
+            rtn.append(char)
+        else:
+            rtn.extend(get_strokes_from_comps(char[list(char.keys())[0]]))
+    return rtn
+
+
+def find_strokes(char, char_dict):
+    ''' Return comp list with strokes only recursively. '''
+    
+    comps = expand_comps(char_dict[char]['comps'], char_dict)
+    strokes = get_strokes_from_comps(comps)
+    char_dict[char] |= { 'strokes': strokes}
+
 def get_lvl_str(comp_tree):
     ''' Get the top most string representation of a component tree. '''
     
-    return ",".join(get_direct_components(comp_tree))
+    return ",".join(simplify_comp_list(comp_tree))
 
-def reduce_comps_recursive(comp_list, from_char = None):
-    ''' Recursively reduce a list of components. '''
+def reduce_comps(comp_list, from_char):
+    ''' Recursively reduce a list of components. Works on both recursive and non-recursive component lists. '''
         
     # Apply applicable reduction rules to comp_list
-    for rule, result in get_rules():
+    reduction_rules, do_not_reduce = get_rules()
+    
+    for rule, result in reduction_rules:
 
         # Skip if rule is not a reduction
-        if (result == from_char): continue 
+        if (result == from_char or from_char in do_not_reduce): 
+            continue 
 
         # Replace if rule is a reduction
         lvl_comps_str = get_lvl_str(comp_list)
@@ -140,7 +173,10 @@ def reduce_comps_recursive(comp_list, from_char = None):
             itm_index = lvl_comps_str.count(',', 0, str_index)
             rule_len = rule.count(',') + 1
             sliced = slice(itm_index,itm_index+rule_len)
-            comp_list[sliced] = [{result: comp_list[sliced]}]
+            if rule_len > 1:
+                comp_list[sliced] = [{result: comp_list[sliced]}]
+            else:
+                comp_list[itm_index] = result
             lvl_comps_str = get_lvl_str(comp_list)
 
     # Recursively go down the component tree
@@ -148,7 +184,7 @@ def reduce_comps_recursive(comp_list, from_char = None):
         if type(comp) is str:
             continue
         for char, comp_tree in comp.items():
-            comp_list[i] = {char: reduce_comps_recursive(comp_tree, char)}
+            comp_list[i] = {char: reduce_comps(comp_tree, char)}
 
 
     return comp_list
@@ -184,7 +220,7 @@ def count_occurrences(comps_recursive, char_dict, kanji):
                 }
                 char_dict[char] = char_dict[char] | update
             else:
-                comps = get_direct_components(comp[char])
+                comps = simplify_comp_list(comp[char])
                 char_dict[char] = {
                     'comps'  : comps, # The components of the character
                     'from'   : kanji,      # Character that this component is originally from
@@ -199,3 +235,38 @@ def count_occurrences(comps_recursive, char_dict, kanji):
             count_occurrences(comp[char], char_dict, kanji)
     
     return char_dict
+
+def find_twins(char_a, char_dict):
+    ''' Find all characters that have the same components. '''
+    twins = set()
+    for char_b in char_dict:
+        if char_a == char_b: continue
+        
+        isNotStroke = char_dict[char_a]['comps'] != None
+        match = char_dict[char_a]['comps'] == char_dict[char_b]['comps']
+        if isNotStroke and match:
+            twins.add(char_b)
+    
+    update = {
+        'twins': twins
+    }
+    
+    char_dict[char_a] = char_dict[char_a] | update
+    
+def find_similar(char_a, char_dict):
+    ''' Find all characters that have the same components. '''
+    
+    similar_lst = []
+    for char_b in char_dict:
+        if char_a == char_b: continue
+        
+        if char_dict[char_a]['comps'] != None and char_dict[char_b]['comps'] != None:
+            a_comps = "".join(char_dict[char_a]['comps'])
+            b_comps = "".join(char_dict[char_b]['comps'])
+            similar_lst.append((char_b, similar(a_comps, b_comps)))
+    
+    update = {
+        'similar': list(reversed(sorted(similar_lst, key=lambda x: x[1])[-10:]))
+    }
+    
+    char_dict[char_a] = char_dict[char_a] | update

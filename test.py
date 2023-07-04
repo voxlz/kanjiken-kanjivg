@@ -1,6 +1,6 @@
 import unittest
 
-from my_code.kanjivg_utils import comps_from_tree, get_comp_list_recursive, load_kanji, reduce_comps_recursive
+from my_code.kanjivg_utils import comps_from_tree, get_comp_list_recursive, load_kanji, reduce_comps
 
 class TestCompTree(unittest.TestCase):
     def get_kanji_comps(self, kanji):
@@ -10,7 +10,7 @@ class TestCompTree(unittest.TestCase):
     def get_kanji_comp_tree(self, kanji):
         kanji_obj = load_kanji(kanji)
         comp_list = get_comp_list_recursive(kanji_obj)
-        comp_list = reduce_comps_recursive(comp_list)
+        comp_list = reduce_comps(comp_list)
         return comp_list
 
     def test_形(self):
@@ -39,7 +39,7 @@ class TestCompTree(unittest.TestCase):
 
     def test_鹿(self):
         comps = self.get_kanji_comps('鹿')
-        self.assertEqual(['⼴', '㇕', 'ᚇ', '比'], comps)
+        self.assertEqual(['⼴', '㇕', '⿚', '比'], comps)
         
     # def test_駦(self):
     #     comps = self.get_kanji_comps('駦')
@@ -47,7 +47,7 @@ class TestCompTree(unittest.TestCase):
     
     def test_咼(self):
         comps = self.get_kanji_comps('咼')
-        self.assertEqual(['⨅', '㇑', '一', '⼌', '口'], comps)
+        self.assertEqual(['⿙', '㇑', '一', '⼌', '口'], comps)
     
     def test_良(self):
         tree = self.get_kanji_comps('良')

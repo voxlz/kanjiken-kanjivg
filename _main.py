@@ -1,11 +1,9 @@
 ## An attempt to create a dependency tree including all JoYo kanji based on their parts.
-from typing import List
-from my_code.kanji import get_jinmeiyo_kanji, get_joyo_kanji, get_valid_kanji
-from my_code.kanjivg_utils import count_occurrences, get_comp_list_recursive, get_comp_list, load_kanji, reduce_comps_recursive
+from my_code.kanji import get_jinmeiyo_kanji, get_joyo_kanji
+from my_code.kanjivg_utils import count_occurrences, expand_comps, find_similar, find_strokes, find_twins, get_comp_list_recursive, get_comp_list, simplify_comp_list, load_kanji, reduce_comps
 from my_code.radicals import get_radicals, get_strokes
-from my_code.reduction import get_rules
-from my_code.tree import Tree
 from my_code.unicode import to_homoglyph
+
 
 # Program limits
 max_comps = 6 # how many kanji parts to allow in UI for a single kanji
@@ -29,8 +27,8 @@ def remove_duplicates(char_set, name):
     return char_set
 
 # Load all characters - Circular bullshit
-joyo        = get_joyo_kanji()
-strokes     = remove_duplicates(get_strokes(), 'strokes')
+joyo             = get_joyo_kanji()
+strokes      = remove_duplicates(get_strokes(), 'strokes')
 radicals    = remove_duplicates(get_radicals(), 'radicals')
 jinmeiyo    = remove_duplicates(get_jinmeiyo_kanji(), 'jinmeiyo')
 
@@ -38,19 +36,6 @@ jinmeiyo    = remove_duplicates(get_jinmeiyo_kanji(), 'jinmeiyo')
 assert radicals.isdisjoint(joyo)
 assert joyo.isdisjoint(jinmeiyo)
 assert radicals.isdisjoint(jinmeiyo)
-    
-def reduce_parts(strokes: List[str]):
-    # '醸' = ['酉', '六', '一', '㇑*', '㇑*', '一', '一', '㇒*', '㇙*', '㇒*', '㇏*'] => ['酉', '六', '一', '㇑*', '㇑*', '二', '𧘇']
-    strokes_str = ','.join(strokes)
-    for (match, result) in get_rules():
-        
-        if match in strokes_str:
-            # if match not in ['㇐*','㇑*']: 
-            #     print(f"Reducing {strokes_str} to {result} in {kanji}")
-            strokes_str = strokes_str.replace(match, result)
-    
-    # Split and remove empty strings
-    return list(filter(lambda c: c, strokes_str.split(',')))
 
 # Look up all joyo kanji in the kanji-svg database
 char_dict = {} # All joyo kanji and their components 
@@ -59,7 +44,8 @@ char_dict = {} # All joyo kanji and their components
 for char in joyo:
     kanji_obj = load_kanji(char)
     comps = get_comp_list(kanji_obj)
-    comps = reduce_parts(comps)
+    comps = reduce_comps(comps, char)
+    comps = simplify_comp_list(comps)
     char_dict[char] = {
         'comps'  : comps,      # The components of the character
         'from'   : char,      # Character that this component is originally from
@@ -69,12 +55,17 @@ for char in joyo:
         'derived': set(),        # Kanji this character occurs in
     }
 
-# Loop through all kanji and their components, adding not-yet-encountered components to the dictionary, counting occurrences along the way
+# Add not-yet-encountered components to the dictionary, counting occurrences along the way. Has to be done AFTER all joyo kanji are added to the dictionary, to have the kanjivg data as a baseline.
 for char in  joyo:
     kanji_obj = load_kanji(char)
     comps          = get_comp_list_recursive(kanji_obj)
-    comps          = reduce_comps_recursive(comps, from_char=char)
+    comps          = reduce_comps(comps, from_char=char)
     char_dict = count_occurrences(comps, char_dict, char)
+
+for char in char_dict:
+    find_strokes(char, char_dict)
+    find_twins(char, char_dict)
+    find_similar(char, char_dict)
 
 # How many have more than 'max_comps' components?
 above_x_comps = [(char, info) for char, info in char_dict.items() if info['n_comps'] > max_comps]
@@ -111,35 +102,31 @@ print(seen_other)
 print(f"User will encounter {seen_components} components")
 print(len(joyo))
 
-# I want consistency in my kanji components. The same kanji should always be represented by the same components. I cannot trust that kanjivg has done this for me, especially since I've edited some kanji, so I will have to do it myself. Therefore I require a dictionary of all kanji + radicals -> most reduced form. It should be based primarily on the corresponding kanjivg entry, and if not present in joyo but part of another kanji, then the most reduced form of that kanji should also be added.
-
 for char in {'鑑', '猛', '漫', '環', '還', '価', '麓', '爵', '蔑', '益', '聴', '塩', '監', '皿'}:
     print(f"{char}: {char_dict[char]['comps']}")
-    
-# Find components with identical components
-for char_a in char_dict:
-    for char_b in char_dict:
-        if char_a != char_b and char_dict[char_a]['comps'] != None and char_dict[char_a]['comps'] == char_dict[char_b]['comps']:
-            print("Identical comp list: ", char_a, char_b, char_dict[char_a]['comps'])
 
-a = char_dict['人']['comps']
+# Print twin characters
+seen = set()
+for char in char_dict:
+    if char in seen: continue
+    twins = char_dict[char]['twins']
+    seen |= twins
+    if len(twins) > 0:
+        print("Identical comp list: ", twins | {char}, char_dict[char]['comps'])
+
+a = char_dict['為']
 
 print()
 
 # todo: make sure the new radicals drag-on and amongus are inserted in the right places.
 
-# todo: Identical comp list:  ⽾ 朱 ['丿', '未'] - why is this happening?
+# todo: not allow radicals of 3 strokes to be reduced. (or 4?) 土 工 should not be  ['十', '一'], unnecessary reduction.
 
-# todo: Identical comp list:  ⺋ ⼙ ['㇆', '㇟']
+# todo: for when svg is not found, check all it's homoglyphs as well.
 
-# todo: 人,十,一 has itself as component? (write test for this.)
+# todo: huh:  㐅 ⼉ ['八'], ⼚ 丆 ['一', '㇒'], 由 田 ['⿙', '㇑', '二']
 
-# todo: deal with the 人, 八, 入 fiasco.
-
-# todo: define a "don't reduce" list of base components. For example, 人, 八, 入, 工,丅, 土, 士
-
-# todo: 𠂊 ⺈ should be reduced to one character, not two. Why do both have an entry?
-
+# todo: Low prio: ensure all strokes in kanjivg path element are actually in stroke list.
 
 # Most repeated component in a kanji? 
 # 傘 has 6 components: ['人', '人', '人', '人', '人', '十']
