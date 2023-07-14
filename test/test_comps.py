@@ -46,6 +46,10 @@ class TestCompTree(unittest.TestCase):
         comps = self.get_kanji_comps('玉')
         self.assertEqual(['王', '㇔'], comps)
 
+    def test_生(self):
+        comps = self.get_kanji_comps('生')
+        self.assertEqual(['𠂉', '土'], comps)
+
     def test_鹿(self):
         comps = self.get_kanji_comps('鹿')
         self.assertEqual(['⼴', '⿖', '比'], comps)

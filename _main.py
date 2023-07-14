@@ -2,11 +2,11 @@
 from collections import defaultdict
 import csv
 from matplotlib import pyplot
-from kanji import get_jinmeiyo_kanji, get_joyo_kanji
-from kanjivg_utils import count_occurrences, find_similar, set_strokes_parents_depth, find_twins, get_comp_list_recursive, simplify_comp_list, load_kanji, reduce_comps
-from order import get_learn_order
-from radicals import get_radicals, get_strokes
-from unicode import to_homoglyph
+from src.kanji import get_jinmeiyo_kanji, get_joyo_kanji
+from src.kanjivg_utils import count_occurrences, find_similar, set_strokes_parents_depth, find_twins, get_comp_list_recursive, simplify_comp_list, load_kanji, reduce_comps
+from src.order import set_learn_order
+from src.radicals import get_radicals, get_strokes
+from src.unicode import to_homoglyph
 
 
 # Program limits
@@ -71,7 +71,7 @@ for char in  joyo:
 
 # -------------- CHAR DICT CREATED FOR ALL CHARACTERS -------------- #
 
-get_learn_order(char_dict)
+set_learn_order(char_dict)
 
 for char in char_dict:
     set_strokes_parents_depth(char, char_dict)

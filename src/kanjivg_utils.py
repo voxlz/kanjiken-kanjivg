@@ -260,6 +260,7 @@ def count_occurrences(comps_recursive, char_dict, kanji):
     
     return char_dict
 
+# TODO: Probably ignore order of components
 def find_twins(char_a, char_dict):
     ''' Find all characters that have the same components. '''
     twins = set()

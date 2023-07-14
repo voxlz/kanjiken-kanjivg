@@ -124,6 +124,28 @@ class TestCompTree(unittest.TestCase):
             'book_occur': 2,
         },
     }
+    
+    rank_order5 = ['a', 'b', 'c', 'd']
+    learn_order5 = ['a', 'c', 'd', 'b']
+    char_dict5 = {
+        'a': {
+            'comps': [],
+            'book_occur': 1009,
+        },
+        'b': {
+            'comps': ['c', 'd'],
+            'book_occur': 1008,
+        },
+        'c': {
+            'comps': [],
+            'book_occur': 1007,
+        },
+        'd': {
+            'comps': [],
+            'book_occur': 1006,
+        },
+    }
+
    
     def test_skipping(self):
         queue = init_queue(self.rank_order)
@@ -140,4 +162,8 @@ class TestCompTree(unittest.TestCase):
         result = prioritize_learn_order(queue, self.char_dict3)
         self.assertListEqual(self.learn_order3, result)
 
+    def test_deep_comps(self):
+        queue = init_queue(self.rank_order5)
+        result = prioritize_learn_order(queue, self.char_dict5)
+        self.assertListEqual(self.learn_order5, result)
 

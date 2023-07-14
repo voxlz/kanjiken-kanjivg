@@ -42,8 +42,6 @@ Which order you should learn the characters in depends on the learner.
 
 Should you learn 番 or 万 first?
 
-
-
 番 =  ['⾤', '田']
 ## Unicode blocks
 
@@ -67,11 +65,13 @@ Some radicals are written differently from their unicode representation. Ex. 人
 
 I have invented new radicals. This was due to not finding a good reduction of strokes with the available unicode characters.
 
-* ⿖ (amongus,  4 comps) : part of  薦,  鹿
-* ⿗ (drag-on,  5 comps) : part of 龍
-* ⿘ (torch,       3 comps) : part of 減, 幾, 歳, etc.
-* ⿙ (bridge,     2 comps) : part of 皿
-* ⿚ (??, 3 comps) : part of 皿
+| Radical | Code | Name | N-comps | Derivative |
+| -- | -- | -- | -- | -- |
+| ⿖ | 2FD6 | amongus | 4 |   薦,  鹿
+| ⿗ | 2FD7 | kobold | 5 | 龍
+| ⿘ | 2FD8 | torch | 3 |  減, 幾, 歳, etc.
+| ⿙ | 2FD9 | bridge | 2 |  皿
+| ⿚ | 2FDA | table-flip| 3 | 皿
 
 ### Positional radicals
 
