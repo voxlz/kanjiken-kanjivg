@@ -4,6 +4,7 @@ import csv
 from matplotlib import pyplot
 from kanji import get_jinmeiyo_kanji, get_joyo_kanji
 from kanjivg_utils import count_occurrences, find_similar, set_strokes_parents_depth, find_twins, get_comp_list_recursive, simplify_comp_list, load_kanji, reduce_comps
+from order import get_learn_order
 from radicals import get_radicals, get_strokes
 from unicode import to_homoglyph
 
@@ -70,71 +71,7 @@ for char in  joyo:
 
 # -------------- CHAR DICT CREATED FOR ALL CHARACTERS -------------- #
 
-# Attempt prioritizing kanji
-with open("data/scriptin-kanji-frequency/book_characters.csv", "r", encoding="utf8") as mapping:
-    reader = csv.reader(mapping, delimiter=",")
-    next(reader) # Skip header
-
-    kanji_ranked = []
-    total_chars = 0
-
-    for row in reader:
-        rank, code, char, char_count = row
-        if char in joyo:
-            total_chars += int(char_count)
-            update = {'char': char, 'rank': len(kanji_ranked), 'char_count': char_count}
-            char_dict[char] |= update
-            kanji_ranked.append(update)
-
-for char in joyo:
-    if 'rank' not in char_dict[char]:
-        print(f"Character {char} is not in the kanji frequency list")
-        update = {'char': char, 'rank': len(kanji_ranked), 'char_count': char_count}
-        char_dict[char] |= update
-        kanji_ranked.append( update)
-
-avg_char_count = total_chars / len(joyo)
-
-
-def find_not_learned(char, learn_order, char_dict, strokes):
-    ''' Recursively get all components that are not learned yet.'''
-    comps = {c for c in char_dict[char]['comps'] if c not in strokes}
-    not_learned = {c for c in comps if c not in learn_order}
-    for c in not_learned:
-        not_learned |= find_not_learned(c, learn_order, char_dict, strokes)
-    return not_learned
-
-# Gain as many points as fast as you can. They are ordered by points. They have to only contain previously learned components.
-learn_order = []
-while len(kanji_ranked) > 0:
-    
-    for i, dict in enumerate(kanji_ranked):
-
-        ## Get the current character
-        char = dict['char']
-        
-        # Get all direct components that are not strokes.
-        comps = [c for c in char_dict[char]['comps'] if c not in strokes]
-
-        # If all components are already learned, add this character to the learn order. (List is sorted so first == most points)
-        if all(c in learn_order for c in comps):
-            learn_order.append(char)
-            kanji_ranked.pop(i)
-            break
-        else:
-            # If not, find out if it's worth learning missing components + char vs skipping and learning next few characters instead.
-
-            not_learned = find_not_learned(char, learn_order, char_dict, strokes)
-            gain_learning = sum(char_dict[c]['char_count'] for c in not_learned) + char_dict[char]['char_count']
-            next_few_chars = kanji_ranked[i+1:i+1+len(not_learned)]
-            gain_skipping = sum(map(lambda x: x['char_count'], next_few_chars))
-            
-            if (gain_learning > gain_skipping):
-                kanji_ranked[i+1:i+1+len(not_learned)] = [{'char': c, 'char_count': 0} for c in not_learned] | kanji_ranked[i]
-                continue
-            else:
-                skipped.append(char)
-        
+get_learn_order(char_dict)
 
 for char in char_dict:
     set_strokes_parents_depth(char, char_dict)

@@ -1,10 +1,10 @@
 import os
 from kvg.kanjivg import Stroke
-from kanji import get_valid_kanji
-from radicals import get_radicals, get_strokes
-from reduction import get_rules
-from tree import Tree
-from unicode import to_homoglyph
+from src.kanji import get_valid_kanji
+from src.radicals import get_radicals, get_strokes
+from src.reduction import get_rules
+from src.tree import Tree
+from src.unicode import to_homoglyph
 from kvg.utils import canonicalId, listSvgFiles
 from difflib import SequenceMatcher
 
@@ -168,8 +168,8 @@ def reduce_comps(comp_list, from_char, do_not_deduce_to=None):
 
     # * Don't reduce if less than 4 strokes
     strokes = get_strokes_from_comps(comp_list)
-    if len(strokes) < 4: 
-        return comp_list
+    if len(strokes) < 5:
+        return strokes
 
     # * Don't reduce if character is banned from reduction
     if from_char in do_not_reduce:

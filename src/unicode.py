@@ -2,8 +2,8 @@
 from ast import literal_eval
 import csv
 
-from kanji import get_jinmeiyo_kanji, get_joyo_kanji
-from radicals import get_radicals, get_strokes
+from src.kanji import get_jinmeiyo_kanji, get_joyo_kanji
+from src.radicals import get_radicals, get_strokes
 
 # Convert string unicode to char
 str_unicode = "0x" + "2ED0"

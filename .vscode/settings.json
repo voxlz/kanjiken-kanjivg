@@ -14,11 +14,13 @@
         "kanjivg",
         "realchr",
         "rfunc",
+        "scriptin",
         "Shinjitai",
         "sortedcollections",
         "stype",
         "touyou",
-        "unichr"
+        "unichr",
+        "xmlhandler"
     ],
     "xml.validation.enabled": false,
 }

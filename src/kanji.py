@@ -44,7 +44,7 @@ def get_jinmeiyo_kanji():
 def get_hyougai_kanji():
     ''' Kanji that appear in the kanji-svg database / are useful radicals but are not in the joyo kanji list '''
     return {
-        '廌','兹','开','并','滕','咼','帀','㠯','𠂉','𧘇','卪','丆','囬','⺈','𠂊','⿚','𠀉','𧰨','𠀎','朿','龶','玄','丅','コ','丄','业','ン','𥫗', '𠚍', '㐅', '𠁼'
+        '廌','兹','开','并','滕','咼','帀','㠯','𠂉','𧘇','卪','丆','囬','⺈','𠂊','⿚','𠀉','𧰨','𠀎','朿','龶','玄','丅','コ','丄','业','ン','𥫗', '𠚍', '㐅', '𠁼', '龹'
     }
 
 valid = OrderedSet()
