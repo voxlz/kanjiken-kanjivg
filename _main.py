@@ -2,8 +2,10 @@
 from collections import defaultdict
 import csv
 from matplotlib import pyplot
+from src import trim_components
 from src.kanji import get_jinmeiyo_kanji, get_joyo_kanji
 from src.kanjivg_utils import count_occurrences, find_similar, set_strokes_parents_depth, find_twins, get_comp_list_recursive, simplify_comp_list, load_kanji, reduce_comps
+from src.meanings import set_char_meanings
 from src.order import set_learn_order
 from src.radicals import get_radicals, get_strokes
 from src.unicode import to_homoglyph
@@ -71,6 +73,13 @@ for char in  joyo:
 
 # -------------- CHAR DICT CREATED FOR ALL CHARACTERS -------------- #
 
+# TODO: Radical Reduction
+# trim_components(char_dict)
+
+# Add meanings to all characters
+set_char_meanings(char_dict)
+
+# Calculate learn order
 set_learn_order(char_dict)
 
 for char in char_dict:
