@@ -27,9 +27,7 @@ def set_char_meanings(char_dict):
     override_meanings = {
         '用': "utilize",
         '成': "become",
-        '候': "climate",
         '理': "logic",
-        '絶': "discontinue",
         '首': "neck",
         '⾴': "page",
         '光': "visible light", # light has double meaning
@@ -43,6 +41,7 @@ def set_char_meanings(char_dict):
         '割' : "fraction",
         '離' : "detach",
         '別' : "separate",
+        '絶': "discontinue",
         # ------------
         '台' : "pedestal",
         '立' : "stand up",
@@ -59,6 +58,7 @@ def set_char_meanings(char_dict):
         '暖' : "mild climate",
         '寒' : "cold climate",
         # ------------
+        '候': "climate",
         '座' : "sit",
         '較' : "contrast",
         '抗' : "confront",
@@ -192,10 +192,8 @@ def set_char_meanings(char_dict):
         # -------------
         '咽' : "choked",
         '没' : "death",
-        # ----------------
         '存' : "aware of",
         '稽' : "practice",
-        # ---------
         '替' : "replace",
         '挫' : "sprain",
         '呉' : "kingdom of wu",
@@ -229,10 +227,6 @@ def set_char_meanings(char_dict):
         '没' : "fall into",
         '容' : "content",
         '穂' : "ear of grain",
-        # -------- thinking ------
-        '稽' : "thought",
-        '考' : "consider",
-        '虞' : "expectation",
         '畏' : "reverence",
         '和' : "japanese",
         '岳' : "peak",
@@ -240,13 +234,6 @@ def set_char_meanings(char_dict):
         '曖' : "ambiguous",
         '恣' : "arbitrary",
         '陣' : "battle-array",
-        # ---- Group ---- (avoid party)
-        '派' : "faction",
-        '閥' : "clique",
-        '団' : "group",
-        '党' : "alliance",
-        '隊' : "troop",
-        '班' : "team", # squad
         # --------------
         '営' : "occupation",
         '凡' : "commonplace",
@@ -258,7 +245,18 @@ def set_char_meanings(char_dict):
         '捉' : "capture",
         '宅' : "home",
         '載' : "placed on",
-        #------- sand --------
+        '虞' : "expectation",
+        # --- Thinking ---
+        '稽' : "thought",
+        '考' : "consider",
+        # ---- Group ---- (party, squad)
+        '派' : "faction",
+        '閥' : "clique",
+        '団' : "group",
+        '党' : "alliance",
+        '隊' : "troop",
+        '班' : "team",
+        # --- Sand ---
         '砂' : "sand",
         '沙' : "grit",
     }
