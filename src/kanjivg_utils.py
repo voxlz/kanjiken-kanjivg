@@ -273,6 +273,8 @@ def find_twins(char_a, char_dict):
             twins.add(char_b)
         
     char_dict[char_a] |= {'twins': twins}
+    
+
 
 def set_parents(parent, comps, char_dict):
     

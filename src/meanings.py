@@ -1,26 +1,31 @@
 import csv
+import itertools
 import json
 from xml.etree.ElementTree import iterparse
 
-from sortedcollections import OrderedSet
 from src.kanji import get_joyo_kanji
-from src.radicals import get_radicals
 from src.tree import Tree
 
-from src.unicode import to_homoglyph
 from itertools import chain,zip_longest
 
+"""
+Let's limit the number of meanings to 3 per kanji.
+
+With top 3 meanings: 
+  Kanji related through meaning.
+    max: 17, max_char: 則, avg: 2.951959544879899
+With all meanings:
+  Kanji related through meaning.
+    max: 37, max_char: 為, avg: 7.653551912568306
+"""
 
 def set_char_meanings(char_dict):
     ''' Set the meanings of each character in char_dict. 
     Goals:
-        1. No two char should have the same primary meaning to avoid confusion.
-        2. Only kanji should have meanings. (radical meanings  will inevitably  overlap with kanji meanings)
+        1. Every char should have a unique primary meaning, and up to 2 secondary meanings.
+        2. Avoid giving radicals a meaning, since they will overlap with kanji. (Unless you manage to find a unique meaning for them)
         3. The meaning should be concise, ideally one word.
-        4. Secondary meanings should be saved as well
-        5. For overlapping meanings (including secondary meanings), save that data in similar_meaning
-        6. Primarily take most common kanji representations into account while finding synonyms. (old usage not very important)
-        
+        4. Consider common kanji usage while overridning meanings. (Don't mind alternate ways to write words)
     '''
     
     # Manually confirmed or changed meanings
@@ -156,7 +161,6 @@ def set_char_meanings(char_dict):
         '仁' : "humanity",
         '群' : "herd",
         '妬' : "envy",
-        '懐' : "pocket",
         # --- Time of Day ---
         '暁' : "dawn",
         '旦' : "daybreak",
@@ -185,6 +189,7 @@ def set_char_meanings(char_dict):
         '鉢' : "pot",
         '鍋' : "pan",
         '蓋' : "lid",
+        '懐' : "pocket",
         # --- Hide ---
         '蔽' : "conceal",
         '隠' : "hide",
@@ -303,12 +308,12 @@ def set_char_meanings(char_dict):
     with open("data/davidluzgouveia-kanji-data/kanji.json", "r", encoding="utf8") as file:
         wk = json.load(file)
 
-    meaning_to_char = Tree()
+    meanings_to_char = Tree()
     primary_to_char = Tree()
-    resulting_dict = Tree()
 
     # Select primary meaning, Ensure unique, merge dicts, find kanji with overlapping meanings
     for char in joyo:
+        result_dict = Tree()
 
         # Get meanings from sources
         kd2_meanings = kd2[char]['kd2_meanings'] if char in kd2 else []
@@ -329,7 +334,7 @@ def set_char_meanings(char_dict):
         meanings = [s.lower() for s in meanings if  "(no. " not  in s]
 
         # Remove duplicates
-        meanings = [*dict.fromkeys(meanings)]
+        meanings = [*dict.fromkeys(meanings)][:3]
 
         # Set primary and secondary meanings
         primary = meanings[0] if meanings else ""
@@ -338,14 +343,17 @@ def set_char_meanings(char_dict):
         # Save a reverse dict to later check for duplicate meanings
         primary_to_char.add_or_append(primary, char)
         for meaning in meanings:
-            meaning_to_char.add_or_append(meaning, char)
+            meanings_to_char.add_or_append(meaning, char)
 
-        resulting_dict[char] = {
+        result_dict = {
             'meaning': primary,
             'meaning_sec': secondary,
         } | kd2[char]
-        del resulting_dict[char]['kd2_meanings']
+        del result_dict['kd2_meanings']
+        
+        char_dict[char] |= result_dict
 
+    # Check and print if duplicate primary meanings
     if duplicate_primaries := {
         c for c in primary_to_char 
         if len(primary_to_char[c]) > 1
@@ -355,14 +363,31 @@ def set_char_meanings(char_dict):
             if len(primary_to_char[meaning]) > 1:
                 print(f"Duplicate PRIMARY: {meaning}")
                 for char in primary_to_char[meaning]:
-                    print(f"char: {char} meaning: {[resulting_dict[char]['meaning']] + resulting_dict[char]['meaning_sec']}")
+                    print(f"char: {char} meaning: {[char_dict[char]['meaning']] + char_dict[char]['meaning_sec']}")
 
-    # Check for overlapping  meanings
-    # for meaning in meaning_to_char:
-    #     if len(meaning_to_char[meaning]) > 1:
-    #         print(f"Duplicate meaning: {meaning}")
-    #         for char in meaning_to_char[meaning]:
-    #             print(f"char: {char} meaning: {resulting_dict[char]['meaning']}")
+    # Add duplicate meanings to char_dict as field "overlap_meanings"
+    overlap_meanings = {
+        meaning for meaning in meanings_to_char 
+        if len(meanings_to_char[meaning]) > 1
+    }
+    for meaning in overlap_meanings:
+        for char in meanings_to_char[meaning]:
+            overlap_chars_except_self = [m for m in meanings_to_char[meaning] if m != char]
+            if 'overlap_meanings' in char_dict[char]:
+               char_dict[char]['overlap_meanings'][meaning] = overlap_chars_except_self
+            else:
+                char_dict[char] |= {'overlap_meanings': {meaning: overlap_chars_except_self}}
 
-    print()
-    print(f"Total kanji: {len(resulting_dict)}")
+    # Calculate kanji meaning relations.
+    max_related_kanji = 0
+    max_char = None
+    total = 0
+    a = {char: char_dict[char]['overlap_meanings'] for char in char_dict if 'overlap_meanings' in char_dict[char]}
+    for char, value in dict.items(a):
+        count = len(list(itertools.chain.from_iterable(dict.values(value))))
+        total += count
+        if count > max_related_kanji:
+            max_related_kanji = count
+            max_char = char
+    print(f"Kanji related through meaning.\n max: {max_related_kanji}, max_char: {max_char}, avg: {total / len(a)}")
+        

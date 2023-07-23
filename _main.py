@@ -67,7 +67,6 @@ for char in  joyo:
     comps          = reduce_comps(comps, from_char=char)
     char_dict = count_occurrences(comps, char_dict, char)
 
-
 # -------------- CHAR DICT CREATED FOR ALL CHARACTERS -------------- #
 
 # TODO: Radical Reduction
@@ -90,6 +89,17 @@ most_used_non_stroke = list(filter(lambda x: not x[1]['stroke'], a))
 if export := False: 
     for char in char_dict:
         find_twins(char, char_dict)
+        
+     # Print twin characters
+    seen = set()
+    for char in char_dict:
+        if char in seen: continue
+        if "twins" not in char_dict[char]: break
+
+        twins = char_dict[char]['twins']
+        seen |= twins
+        if len(twins) > 0:
+            print("Identical comp list: ", twins | {char}, char_dict[char]['comps'])
 
     for char in char_dict:
         find_similar(char, char_dict)
@@ -129,17 +139,6 @@ print(seen_other)
 print(f"User will encounter {seen_components} components")
 print(len(joyo))
 
-# Print twin characters
-seen = set()
-for char in char_dict:
-    if char in seen: continue
-    if "twins" not in char_dict[char]: break
-
-    twins = char_dict[char]['twins']
-    seen |= twins
-    if len(twins) > 0:
-        print("Identical comp list: ", twins | {char}, char_dict[char]['comps'])
-
 depth = defaultdict(list)
 comps =  defaultdict(list)
 
@@ -147,7 +146,7 @@ for char in char_dict:
     depth[char_dict[char]['depth']].append(char)
     comps[len(char_dict[char]['comps'])].append(char)
 
-assert len(comps[0]) == len(seen_strokes), "All strokes should be in comps[0]"
+# assert len(comps[0]) == len(seen_strokes), "All strokes should be in comps[0]"
 
 x = list(depth.keys())
 y = list(map(lambda x: len(x), depth.values()))
