@@ -1,10 +1,9 @@
 import os
 from kvg.kanjivg import Stroke
-from src.kanji import get_valid_kanji
 from src.radicals import get_radicals, get_strokes
 from src.reduction import get_rules
 from src.tree import Tree
-from src.unicode import to_homoglyph
+from src.unicode import get_valid_kanji, to_homoglyph
 from kvg.utils import canonicalId, listSvgFiles
 from difflib import SequenceMatcher
 

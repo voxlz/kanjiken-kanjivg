@@ -10,3 +10,4 @@ I think it would be a good marketing strategi to do some videos about the follow
 * Unicode and why characters change size depending on other characters. try removing inside brackets: (卄) | 艹
 * Unicode and why you cannot put () after ⿓ in code.
 * Why japanese is twice as hard to learn as other languages
+* bagua. What is it? https://en.wiktionary.org/wiki/bagua#English

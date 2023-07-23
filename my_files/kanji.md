@@ -73,6 +73,15 @@ I have invented new radicals. This was due to not finding a good reduction of st
 | ⿙ | 2FD9 | bridge | 2 |  皿
 | ⿚ | 2FDA | table-flip| 3 | 皿
 
+contenders: bottom part of 長,, 喪, 喰, 食 | similar to 𧘇, 艮
+
+### Imperfect radicals
+
+I have broken my own rules with these radicals, since they sometimes appear with a differently slanted stroke. Should probably create new radicals for these.
+
+* 喪, 長 | 𧘇  first line sometimes not slanted.
+* ?? | 王  last line sometimes slanted.
+
 ### Positional radicals
 
 Certain radicals have multiple representations. Here follows a list of radical pars not considered homoglyphs, and if I consider them identical or not.

@@ -3,10 +3,11 @@ import itertools
 import json
 from xml.etree.ElementTree import iterparse
 
-from src.kanji import get_joyo_kanji
 from src.tree import Tree
 
 from itertools import chain,zip_longest
+
+from src.unicode import get_joyo_kanji
 
 """
 Let's limit the number of meanings to 3 per kanji.
@@ -28,8 +29,10 @@ def set_char_meanings(char_dict):
         4. Consider common kanji usage while overridning meanings. (Don't mind alternate ways to write words)
     '''
     
+    # TODO: Radicals like ⾗ are their own non-joyo kanji (豕) and used in joyo kanji like 家. These should be given a meaning. Avoiding radicals might not be an option.
+    
     # Manually confirmed or changed meanings
-    override_meanings = {
+    override_joyo_meanings = {
         '用': "utilize",
         '成': "become",
         '理': "logic",
@@ -327,8 +330,8 @@ def set_char_meanings(char_dict):
         # Weave the two lists together
         weave = chain.from_iterable(zip_longest(kd2_meanings, ka_meanings, wk_meanings))
         meanings = list(filter(lambda x : x, weave))
-        if char in override_meanings:
-            meanings.insert(0, override_meanings[char])
+        if char in override_joyo_meanings:
+            meanings.insert(0, override_joyo_meanings[char])
 
         # Filter out radical meanings and lower case
         meanings = [s.lower() for s in meanings if  "(no. " not  in s]
