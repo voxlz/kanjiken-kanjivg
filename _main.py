@@ -3,36 +3,20 @@ from collections import defaultdict
 import csv
 from matplotlib import pyplot
 from src import trim_components
+from src.grade import set_kanken
 from src.kanjivg_utils import count_occurrences, find_similar, set_strokes_parents_depth, find_twins, get_comp_list_recursive, simplify_comp_list, load_kanji, reduce_comps
 from src.meanings import set_char_meanings
 from src.order import set_learn_order
-from src.radicals import get_radicals, get_strokes
-from src.unicode import get_jinmeiyo_kanji, get_joyo_kanji, to_homoglyph
-
+from src.unicode import get_jinmeiyo, get_joyo, get_radicals, get_strokes, to_homoglyph
 
 # Program limits
 max_comps = 6 # how many kanji parts to allow in UI for a single kanji
 
-# Clear the cache of python 
-import importlib
-clear_cache = importlib.invalidate_caches()
-
-def remove_duplicates(char_set, name):
-    ''' Remove homoglyph duplicates from a set of
-    characters with to_homoglyph. '''
-    
-    old_len = len(char_set)
-    pref_chars = set(map(to_homoglyph, char_set))
-    char_set = pref_chars.intersection(char_set)
-    # removed = pref_chars.difference(char_set)
-    print(f"{name}: {old_len} -> {len(char_set)} (-{old_len - len(char_set)})")
-    return char_set
-
-# Load all characters - Circular bullshit
-joyo             = get_joyo_kanji()
-strokes      = remove_duplicates(get_strokes(), 'strokes')
-radicals    = remove_duplicates(get_radicals(), 'radicals')
-jinmeiyo    = remove_duplicates(get_jinmeiyo_kanji(), 'jinmeiyo')
+# Load all characters
+joyo             = get_joyo()
+strokes      = get_strokes()
+jinmeiyo    = get_jinmeiyo()
+radicals    = get_radicals()
 
 # Ensure no overlapping characters
 assert radicals.isdisjoint(joyo)
@@ -49,14 +33,15 @@ for char in joyo:
     comps = reduce_comps(comps, char)
     comps = simplify_comp_list(comps)
     char_dict[char] = {
-        'comps'  : comps,      # The components of the character
-        'from'   : char,      # Character that this component is originally from
-        'joyo'   : True,       # Whether this character is a joyo kanji
-        'stroke'   : False,       # Whether this character is a joyo kanji
-        'occur'  : 1,          # How often this char occurs as a comp, including itself
-        'n_comps': len(comps),
-        'derived': set(),        # Kanji this character occurs in
-        'parent': set(),   # Kanji this character occurs in directly
+        'general'      : {
+            'group' : "joyo"       # type: joyo, jinmeiyo, radical, stroke, hyougai
+        },
+        'comps'          : comps,      # The components of the character
+        'from'            : char,      # Character that this component is originally from
+        'occur'          : 1,          # How often this char occurs as a comp, including itself
+        'n_comps'      : len(comps),
+        'derived'      : set(),        # Kanji this character occurs in
+        'parent'        : set(),   # Kanji this character occurs in directly
     }
 
 # Add not-yet-encountered components to the dictionary, counting occurrences along the way. Has to be done AFTER all joyo kanji are added to the dictionary, to have the kanjivg data as a baseline.
@@ -71,8 +56,10 @@ export = False
 # TODO: Radical Reduction
 # trim_components(char_dict)
 
+set_kanken(char_dict)
+
 # Add meanings to all characters
-if export:
+if True:
     set_char_meanings(char_dict)
 
 # Calculate learn order
@@ -85,7 +72,7 @@ for char in char_dict:
 
 a = list(char_dict.items())
 a = list(sorted(a, key=lambda x:  len(x[1]['parent']), reverse=True))
-most_used_non_stroke = list(filter(lambda x: not x[1]['stroke'], a))
+most_used_non_stroke = list(filter(lambda x:  x[1]['general']['group'] != 'stroke', a))
 
 if export: 
     for char in char_dict:

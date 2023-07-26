@@ -7,7 +7,7 @@ from src.tree import Tree
 
 from itertools import chain,zip_longest
 
-from src.unicode import get_joyo_kanji
+from src.unicode import get_homoglyphs, get_joyo, to_homoglyph
 
 """
 Let's limit the number of meanings to 3 per kanji.
@@ -19,6 +19,42 @@ With all meanings:
   Kanji related through meaning.
     max: 37, max_char: 為, avg: 7.653551912568306
 """
+joyo = get_joyo()
+
+def get_meanings(char, wk, ka, kd2, override):
+    ''' Get the meanings of a character from the sources.''' 
+    
+    # Get meanings from sources
+    has_wk_meaning = char in wk and wk[char]['wk_meanings']
+    
+    kd2_meanings = kd2[char]['kd2_meanings'] if char in kd2 else []
+    ka_meanings = ka[char]['meanings'] if char in ka else []
+    wk_meanings = wk[char]['wk_meanings'] if has_wk_meaning  else []
+    wk_meanings = [s.replace("^", "") for s in wk_meanings]
+
+    # Weave the lists together
+    weave = chain.from_iterable(zip_longest(kd2_meanings, ka_meanings, wk_meanings))
+    meanings = list(filter(lambda x : x, weave))
+    
+    # Override meanings
+    if char in override:
+        meanings.insert(0, override[char])
+
+    # lower case
+    meanings = [s.lower() for s in meanings]
+
+    # Remove duplicates
+    meanings = [*dict.fromkeys(meanings)]
+    
+    # If joyo, remove radical meanings.
+    if char in joyo:
+        meanings = [meaning for meaning in meanings if "radical (no." not in meaning]
+    
+    # If non-joyo, add "radical" to end of string of meanings
+    # if char not in joyo:
+    #     meanings = [f"{meaning} radical" for meaning in meanings]
+        
+    return meanings[:3]
 
 def set_char_meanings(char_dict):
     ''' Set the meanings of each character in char_dict. 
@@ -76,15 +112,6 @@ def set_char_meanings(char_dict):
         '討' : "chastise",
         '貿' : "exchange",
         '便' : "convenience",
-        '⾱' : "n/a", # hyougai,
-        '几' : "n/a", # radical
-        '⼹' : "n/a", # radical
-        '⺔' : "n/a", # radical
-        '⻖' : "n/a", # radical
-        '⺅' : "n/a", # radical
-        '⺌' : "n/a", # radical
-        '㇠' : "n/a", # radical,
-        '㇟' : "n/a", # radical,
         '将' : "officer",
         '概' : "approximate",
         '頃' : "proximate time",
@@ -169,6 +196,7 @@ def set_char_meanings(char_dict):
         '旦' : "daybreak",
         '晩' : "nightfall",
         '夕' : "evening",
+        '昏' : "dusk",
         '夜' : "night",
         # --- Darkness ---
         '暮' : "get dark",
@@ -242,6 +270,11 @@ def set_char_meanings(char_dict):
         '曖' : "ambiguous",
         '恣' : "arbitrary",
         '陣' : "battle-array",
+        '庄': "manor", # level seemingly not used in words
+        '均': "average", # level seemingly not used in words
+        '喬': "boasting", 
+        '孟': "start of",
+        '胡': "foreign", # Non-Han people
         # --------------
         '営' : "occupation",
         '凡' : "commonplace",
@@ -250,6 +283,9 @@ def set_char_meanings(char_dict):
         '畿' : "suburbs of capital",
         '未' : "not yet",
         '非' : "not",
+        '勿' : "must not",
+        '莫' : "do not",
+        '毋' : "mother (radical)",
         '捉' : "capture",
         '宅' : "home",
         '載' : "placed on",
@@ -267,9 +303,92 @@ def set_char_meanings(char_dict):
         # --- Sand ---
         '砂' : "sand",
         '沙' : "grit",
-    }
 
-    joyo = get_joyo_kanji()
+        # -------------------------- JOYO END --------------------------
+        
+        # --- Custom ---
+        '⿖': "amongus (radical)",
+        '⿗': "kobold (radical)",
+        '⿘': "torch (radical)",
+        '⿙': "bridge (radical)",
+        '⿚': "table-flip (radical)",
+        # --- Katakana ---
+        '⼛': "mu (katakana)",
+        'ン': "n (katakana)",
+        '𠂊': "ku (katakana)",
+        '㐅': "me (katakana)",
+        'コ': "ko (katakana)",
+        # --- Non-Dictionary Entry Characters ---
+        '丷': "horns",
+        '⺍': "grass (radical)",
+        '⺌': "unicorn",
+        '⺀': "repeat", # 棗 -> 枣
+        '𠂉': "gun (radical)",
+        '𠈌': "crowd",
+        '𧘇': "",
+        '⺋': "knot (radical)",
+        '㠯': "two mouths",
+        '卄' : "",
+        '𠚍': "herbs (radical)",
+        '朿': "thorn (radical)",
+        
+        # --- Radical Variants of Kanji ---
+        '𥫗': "bamboo (radical)", #variant of 竹 (bamboo)
+        '⻟': "eat (radical)", # variant of 食 (eat)
+        '⻞': "food (radical)", # variant of 食 (eat)
+        '𠀉': "hill (radical)", # variant of 丘 (hill)
+        '⺖': "heart (radical)",
+        '⼺': "three (radical)",
+        '灬': "fire (radical)",
+        '⺨': "dog (radical)",
+        '⻍': "walk (radical)",
+        '⼏': "table (radical)",
+        '⺡': "water (radical)",
+        '⼶': "two-hands (radical)",
+        '⽾': "tree-branch tree (radical)",
+        '⾫': "old bird (radical)",
+        '豸': "badger (radical)", # This does legit not help at all :D
+        '⽓': "steam (radical)",
+        '⺙': "folding chair (radical)",
+        '开': "open (radical)",
+        '⻖': "village (radical)",
+        '釆': "topped rice (radical)",
+        '扌': "hand (radical)", # variant from 手 (hand)
+        '⺷': "sheep (radical)", # variant from 羊 (sheep)
+        '𧰨': "gather (radical)",
+        '龶': "master (radical)", # variant from 主 (master)
+        '卪': "stamped seal (radical)",
+        # --- Shinmeiyoo (simplifications)---
+        '坐': "squat",
+        '彳': "stroll", # simplified from 行 (go)
+        # --- Hyougai ---
+        '⾣': "sign of the bird" ,
+        '逢': "tryst", # meeting between lovers 
+        '沓': "footwear",
+        '丄': "up",
+        '丅': "down",
+        '丞': "rescue", # only used in 丞相 (rescue minister)
+        '⼽': "capped torch", # due to ⿘, kanji called halberd
+        '⽦': "counter for animals",
+        '朋': "pal",
+        '吾': "me",
+        '云': "speak", # say already in use
+        '㑒': "unanimous",
+        '𧘇': "attire (radical)",
+        '业': "almost lined up",
+        '习': "wing (radical)",
+        '囬': "go round", #revolve alt 回
+        '𠀎': "grounded well", # from 井 (well)
+        '丆': "cotton (radical)", # From korean 면 (cotton) <- 綿 (wool)
+        '兹': "excess (alt)", # Variant from 玆 (excess)
+        '卄': "twenty (alt)", # Variant from 廿 (twenty)
+        # --- Kyūjitai (where Shinjitai is joyo) ---
+        '僉': "unanimous (traditional)", # only used in 僉僚 (all colleagues)
+        '⿓': "dragon (traditional)",
+    }
+    
+    # apply to_homoglyph to all keys in override_joyo_meanings
+    override_joyo_meanings = {to_homoglyph(k): v for k, v in override_joyo_meanings.items()}
 
     # Read KanjiDic2.xml - 13,108 kanji
     with open("data/kanjidic2.xml", "r", encoding="utf8") as file:
@@ -282,11 +401,16 @@ def set_char_meanings(char_dict):
             elif elem.tag == 'meaning' and 'm_lang' not in elem.attrib:
                 kd2[curr_char]['kd2_meanings'] +=  [elem.text]
             elif elem.tag == 'cp_value' and elem.attrib['cp_type'] == 'ucs':
-                kd2[curr_char]['cp'] = elem.text
+                kd2[curr_char]['general']['cp'] = elem.text
             elif elem.tag == 'grade':
-                kd2[curr_char]['grade'] = elem.text
+                if (grade := int(elem.text)) < 7:
+                    kd2[curr_char]['general']['grade'] = grade
+                if grade > 8:
+                    kd2[curr_char]['general']['group'] = 'jinmeiyo'
+                if grade == 10:
+                    kd2[curr_char]['general']['joyo_alt'] = True
             elif elem.tag == 'jlpt':
-                kd2[curr_char]['jlpt'] = elem.text
+                kd2[curr_char]['general']['jlpt'] = int(elem.text)
 
     # Read KanjiAlive.csv - 1235 kanji
     with open("data/kanjialive/ka_data.csv", "r", encoding="utf8") as file:
@@ -315,33 +439,25 @@ def set_char_meanings(char_dict):
     primary_to_char = Tree()
 
     # Select primary meaning, Ensure unique, merge dicts, find kanji with overlapping meanings
-    for char in joyo:
+    for char, entry in dict.items(char_dict):
+        
+        # Strokes have no meaning
+        if entry['general']['group'] == 'stroke': continue
+        
         result_dict = Tree()
 
-        # Get meanings from sources
-        kd2_meanings = kd2[char]['kd2_meanings'] if char in kd2 else []
-
-        ka_meanings = ka[char]['meanings'] if char in ka else []
-        wk_meanings = wk[char]['wk_meanings'] if char in wk and wk[char]['wk_meanings']  else []
-        wk_meanings = [s.replace("^", "") for s in wk_meanings]
-
-        if (char == "鉢"):
-            print()
-        # Weave the two lists together
-        weave = chain.from_iterable(zip_longest(kd2_meanings, ka_meanings, wk_meanings))
-        meanings = list(filter(lambda x : x, weave))
-        if char in override_joyo_meanings:
-            meanings.insert(0, override_joyo_meanings[char])
-
-        # Filter out radical meanings and lower case
-        meanings = [s.lower() for s in meanings if  "(no. " not  in s]
-
-        # Remove duplicates
-        meanings = [*dict.fromkeys(meanings)][:3]
+        homoglyphs =  [to_homoglyph(char)] + get_homoglyphs(char)
+        for temp_char in homoglyphs:
+            meanings = get_meanings(temp_char, wk, ka, kd2, override_joyo_meanings)
+            if len(meanings) > 0:
+                break
 
         # Set primary and secondary meanings
         primary = meanings[0] if meanings else ""
         secondary = meanings[1:] if len(meanings) > 1 else []
+        
+        if primary == "":
+            primary == "MISSING"
 
         # Save a reverse dict to later check for duplicate meanings
         primary_to_char.add_or_append(primary, char)
@@ -352,7 +468,8 @@ def set_char_meanings(char_dict):
             'meaning': primary,
             'meaning_sec': secondary,
         } | kd2[char]
-        del result_dict['kd2_meanings']
+        if 'kd2_meanings' in result_dict:
+            del result_dict['kd2_meanings']
         
         char_dict[char] |= result_dict
 
@@ -366,8 +483,14 @@ def set_char_meanings(char_dict):
             if len(primary_to_char[meaning]) > 1:
                 print(f"Duplicate PRIMARY: {meaning}")
                 for char in primary_to_char[meaning]:
-                    print(f"char: {char} meaning: {[char_dict[char]['meaning']] + char_dict[char]['meaning_sec']}")
+                    o = "*" if char in override_joyo_meanings else ''
+                    j = "j" if char in joyo else ''
+                    print(f"char: {j}{o}{char} meaning: {[char_dict[char]['meaning']] + char_dict[char]['meaning_sec']}")
 
+    missing = [char for char in char_dict if 'meaning' in char_dict[char] and char_dict[char]['meaning'] == "MISSING"]
+    for char in missing:
+        print(f"Missing meaning for {char}")
+        
     # Add duplicate meanings to char_dict as field "overlap_meanings"
     overlap_meanings = {
         meaning for meaning in meanings_to_char 
@@ -393,4 +516,6 @@ def set_char_meanings(char_dict):
             max_related_kanji = count
             max_char = char
     print(f"Kanji related through meaning.\n max: {max_related_kanji}, max_char: {max_char}, avg: {total / len(a)}")
+    
+    print()
         

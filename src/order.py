@@ -3,7 +3,7 @@ import csv
 from  queue import LifoQueue
 from sortedcollections import OrderedSet
 
-from src.radicals import get_strokes
+from src.unicode import get_strokes
 
 def get_sorted_joyo_frequencies(char_dict, medium):
     ''' Get the frequency and rank of each written character. Returns a list of dictionaries. '''

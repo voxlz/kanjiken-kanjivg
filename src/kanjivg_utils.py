@@ -1,9 +1,8 @@
 import os
 from kvg.kanjivg import Stroke
-from src.radicals import get_radicals, get_strokes
 from src.reduction import get_rules
 from src.tree import Tree
-from src.unicode import get_valid_kanji, to_homoglyph
+from src.unicode import get_radicals, get_strokes, get_valid_kanji, to_homoglyph
 from kvg.utils import canonicalId, listSvgFiles
 from difflib import SequenceMatcher
 
@@ -225,8 +224,9 @@ def count_occurrences(comps_recursive, char_dict, kanji):
                 char_dict[char] = {
                     'comps'  : [],   # The components of the character
                     'from'   : kanji,  # Character that this component is originally from
-                    'joyo'   : False,  # Whether this character is a joyo kanji
-                    'stroke'   : True,  # Whether this character is a stroke
+                    'general'      : {
+                        'group' : "stroke"       # type: joyo, jinmeiyo, radical, stroke, hyougai
+                    },
                     'occur'  : 1,      # How often this char occurs as a comp, including itself
                     'n_comps': 0,
                     'derived': {kanji}, # Kanji 
@@ -243,15 +243,18 @@ def count_occurrences(comps_recursive, char_dict, kanji):
             else:
                 comps = reduce_comps(comp[char], char)
                 comps = simplify_comp_list(comps) # 
+                isRadical = char in get_radicals()
+                group = "radical" if isRadical else "hyougai"
                 char_dict[char] = {
-                    'comps'  : comps, # The components of the character
-                    'from'   : kanji,      # Character that this component is originally from
-                    'joyo'   : False,      # Whether this character is a joyo kanji
-                    'stroke'   : False,  # Whether this character is a stroke
-                    'occur'  : 1,          # How often this char occurs as a comp, including itself
+                    'comps'  : comps, # The comps of the char
+                    'from'   : kanji,  # Char that this comp is originally from
+                    'general' : {
+                        'group' : group,  # joyo, jinmeiyo, radical, stroke, hyougai
+                    },
+                    'occur'  : 1,  # How often this char occurs as a comp, including itself
                     'n_comps': len(comp[char]),
-                    'derived': {kanji}, # Kanji
-                    'parent': set(),   # Kanji this character occurs in directly
+                    'derived': {kanji}, # Chars this char occurs in
+                    'parent': set(),  # Char the curr char is a direct component of
                 }
             
             # Recursively count occurrences of this component

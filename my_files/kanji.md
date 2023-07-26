@@ -24,12 +24,12 @@ To have a consistent variable naming convention, I will now break down and mysel
 Let's talk about some principles I'm going for here.
 
 1. **No duplicates**. If there are any characters that look identical but are not, so called homoglyphs,  they should be considered identical. (Ex. ㇁ == ㇓)
-2. **No variations**. For two components to be considered identical, they need to have matching stroke type, stroke order, and stroke propotions. (Ex. ⺅ !=  人 | ⼇ != 丄)
+2. **No variations**. For two components to be considered identical, they need to have matching stroke type, stroke order, and stroke proportions. (Ex. ⺅ !=  人)
 3. **Max 6 components**. Every character is broken down to 2-6 components, ideally 4. This is a good compromise between complexity and usability.
-4. **Keep stroke order**. Components that contain non consecutive strokes, i.e. pausing the component to draw something else,  are not allowed. (Ex. 口 and 戈)
+4. **Keep stroke order**. Components that contain non consecutive strokes, i.e. pausing the component to draw something else,  are not allowed. (Ex. 口 in 国)
 5. **Prune components**. If a component can be removed without breaking any above rule, and it does not push component count beyond 4  elsewhere, it should be.
 6. **Consistency**. A character should always be represented by the same components. Inconsistencies are not allowed, due to the induced complexity.
-7. **Shallowness**. Certain components with 3 strokes can be broken down into 2 components. To avoid unnessesary depth, this is not allowed. (Ex. 士 != [十 + 一])
+7. **Shallowness**. Certain components with 3 strokes can be broken down into 2 components. To avoid unnecessary depth, this is not allowed. (Ex. 士 != [十 + 一])
 
 These rules ensure that knowing the components of a characters is knowing how to draw the character. That is the goal of the KanjiKen system.
 
@@ -43,11 +43,13 @@ Which order you should learn the characters in depends on the learner.
 Should you learn 番 or 万 first?
 
 番 =  ['⾤', '田']
+
 ## Unicode blocks
 
 * Kangxi radicals: 2F00–2FD5
 * CJK radicals supplement: 2E80–2EFF
 * CJK Strokes: 31C0–31EF (31C0-31E3 used)
+* CJK Unified Ideographs: 4E00–9FFF (4E00-9FCB used)
 
 ## Notes
 
@@ -67,13 +69,16 @@ I have invented new radicals. This was due to not finding a good reduction of st
 
 | Radical | Code | Name | N-comps | Derivative |
 | -- | -- | -- | -- | -- |
-| ⿖ | 2FD6 | amongus | 4 |   薦,  鹿
+| ⿖ | 2FD6 | amongus | open cage | 4 |   薦,  鹿
 | ⿗ | 2FD7 | kobold | 5 | 龍
 | ⿘ | 2FD8 | torch | 3 |  減, 幾, 歳, etc.
 | ⿙ | 2FD9 | bridge | 2 |  皿
 | ⿚ | 2FDA | table-flip| 3 | 皿
 
-contenders: bottom part of 長,, 喪, 喰, 食 | similar to 𧘇, 艮
+contenders:
+
+* bottom part of 長, 喪, 喰, 食 | similar to 𧘇, 艮
+* Full-scale version of 龶
 
 ### Imperfect radicals
 
@@ -112,8 +117,26 @@ These may come from a kanji, but look different / have different stroke order. T
 
 To make matters worse, some characters are written differently from how they are precented in unicode. This is the case for 人, 八, 入, and possibly more. I will use the hand written strokes of these characters, since stroke order only matters when writing by hand, and we already care about that.
 
-### Shiny (shinjitai) kanji
+### Shiny (shinjitai) and  kyūjitai kanji
 
 Kanji where joyo is using old radical / version of kanji compared to shinjitai (extended).
 
-* 籠 Jōyō -> 篭 shinjitai亠 
+* 籠 Jōyō -> 篭 shinjitai亠
+
+### Different groupings of kanji characters
+
+* kyōiku - Education Kanji (1,026 characters) - 2020 [subset of jōyō]
+* jōyō - Daily Use Kanji (2,136 characters) - 2010 [replace Tōyō kanji]
+* jinmeiyō - Name Kanji (863 characters) - 2017
+* hyōgai - Uncommon Kanji (3351 characters, from kanken) [kanji not in jōyō or jinmeiyō]
+
+### Difficulty levels
+
+* Kyōiku  - 1st to 6th grade (6 levels)
+* JLPT - N5 to N1 (5 levels)
+* Kanken - Level 10 to Level 1 (12 levels)
+
+### Japanese proficiency levels
+
+* JLPT - Japanese Language Proficiency Test
+* Kanken - Kanji Kentei (Kanji Aptitude Test)

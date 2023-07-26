@@ -10,18 +10,18 @@ def trim_components(char_dict: dict):
     b = char_dict.items()
     # sort based on affected characters + depth
     b = sorted(b, key=lambda x:  len(x[1]['parent']) + x[1]['depth'] / 10)
-    b = filter(lambda x: not x[1]['joyo'] and not x[1]['stroke'], b)  # filter out joyo and strokes
+    b = filter(lambda x: x[1]['general']['group'] not in ['joyo', 'stroke'], b)
     least_used_radicals = list(b) # can't remove strokes
 
     # Remove radicals that are not needed -- Todo: Ensure that 习 is removed.
     removable_radicals = set()
     for char in least_used_radicals:
-        
+
         couldRemove = True
         result = []
 
         # Check if removing the radical would make the kanji have more than 6 components
-        
+
         for parent in char[1]['parent']:
             comps: list = char_dict[parent]['comps'].copy()
             while char[0] in comps:
@@ -30,9 +30,9 @@ def trim_components(char_dict: dict):
 
             assert comps != char_dict[parent]['comps'], "Comps should have changed"
 
-            
+
             # comps = simplify_comp_list(reduce_comps(comps, parent, char[0]))
-            
+
             if len(comps) > 4:
                 couldRemove = False
                 break

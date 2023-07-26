@@ -9,13 +9,13 @@ def get_rules():
     reduction_rules = [
         # Considered identical by KanjiKen
         ('⺕', '⼹'),
-        
         ('⺲', '皿'),
         ('⺈', '𠂊'),
         ('𠆢', '人'),
         ('⼇', '丄'),
         ('艹', '卄'),
         ('⺘', '才'),
+        ('龹', '关'),
         
         # Reduction Rules
         ('㇑,㇑,㇔,㇒,㇐', '业'),
