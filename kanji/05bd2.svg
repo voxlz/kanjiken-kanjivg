@@ -48,24 +48,24 @@ See http://creativecommons.org/licenses/by-sa/3.0/ for more details.
 				</g>
 			</g>
 			<g id="kvg:05bd2-g3" kvg:position="bottom">
-				<g id="kvg:05bd2-g4" kvg:element="三" kvg:part="1">
+				<g kvg:element="𠀎" kvg:position="top">
 					<g id="kvg:05bd2-g5" kvg:element="一">
 						<path id="kvg:05bd2-s4" kvg:type="㇐"
 							d="M31,38.15c2.12,0.47,4.61,0.36,6.87,0.08c9.35-1.17,22.25-3.29,32.12-4.06c2.22-0.17,4.31-0.22,6.51,0.2" />
 					</g>
-				</g>
-				<path id="kvg:05bd2-s5" kvg:type="㇑a"
-					d="M42.06,29.38c0.97,0.97,1.81,2.62,1.76,4.25C43.8,34.54,45,50,45.5,58" />
-				<path id="kvg:05bd2-s6" kvg:type="㇑a"
-					d="M62.06,26.13c1.09,1.09,1.31,2.99,1.26,4.25C63.1,35.93,62,46,61,56.25" />
-				<g id="kvg:05bd2-g6" kvg:element="三" kvg:part="2">
-					<g id="kvg:05bd2-g7" kvg:element="一">
-						<path id="kvg:05bd2-s7" kvg:type="㇐"
-							d="M31.62,49.15c2.38,0.47,4.61,0.35,6.87,0.07c9.68-1.2,20.99-2.98,31.13-3.97c2.28-0.22,4.61-0.32,6.88,0.12" />
-					</g>
-					<g id="kvg:05bd2-g8" kvg:element="一">
-						<path id="kvg:05bd2-s8" kvg:type="㇐"
-							d="M20.12,60.9c3.16,0.72,6.33,0.37,9.5,0c15.12-1.76,35.59-4.41,50.47-5.21c3.34-0.18,6.59-0.27,9.9,0.18" />
+					<path id="kvg:05bd2-s5" kvg:type="㇑a"
+						d="M42.06,29.38c0.97,0.97,1.81,2.62,1.76,4.25C43.8,34.54,45,50,45.5,58" />
+					<path id="kvg:05bd2-s6" kvg:type="㇑a"
+						d="M62.06,26.13c1.09,1.09,1.31,2.99,1.26,4.25C63.1,35.93,62,46,61,56.25" />
+					<g id="kvg:05bd2-g6" kvg:element="二">
+						<g id="kvg:05bd2-g7" kvg:element="一">
+							<path id="kvg:05bd2-s7" kvg:type="㇐"
+								d="M31.62,49.15c2.38,0.47,4.61,0.35,6.87,0.07c9.68-1.2,20.99-2.98,31.13-3.97c2.28-0.22,4.61-0.32,6.88,0.12" />
+						</g>
+						<g id="kvg:05bd2-g8" kvg:element="一">
+							<path id="kvg:05bd2-s8" kvg:type="㇐"
+								d="M20.12,60.9c3.16,0.72,6.33,0.37,9.5,0c15.12-1.76,35.59-4.41,50.47-5.21c3.34-0.18,6.59-0.27,9.9,0.18" />
+						</g>
 					</g>
 				</g>
 				<g id="kvg:05bd2-g9" kvg:element="八">

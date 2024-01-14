@@ -72,17 +72,15 @@ See http://creativecommons.org/licenses/by-sa/3.0/ for more details.
 							d="M49.62,54.43c2.53-0.24,4.15-0.59,6.51-0.88c0.67-0.08,1.4-0.16,2.23-0.23" />
 					</g>
 				</g>
-				<g id="kvg:08208-g7" kvg:element="𦥑" kvg:part="2" kvg:variant="true"
-					kvg:original="臼" kvg:tradForm="true" kvg:radical="tradit">
+				<g id="kvg:08208-g7" kvg:element="ヨ">
 					<path id="kvg:08208-s11" kvg:type="㇕c"
 						d="M74.6,23.98c1.53,0.27,2.64,0.56,4.23,0.37c3.93-0.48,6.68-0.98,8.59-1.25c2.09-0.29,3.08,0.58,2.6,2.75C88.62,32.12,83.88,57.88,83,64.5" />
 					<path id="kvg:08208-s12" kvg:type="㇐c"
 						d="M73.5,36.5c1,0.38,2.08,0.6,3.25,0.42c4.38-0.67,8-1.04,10.25-1.42" />
+					<path id="kvg:08208-s13" kvg:type="㇐c"
+						d="M72.5,49c0.69,0.15,1.45,0.55,2.24,0.46c4.01-0.46,7.39-1.09,9.76-1.21" />
 				</g>
-				<path id="kvg:08208-s13" kvg:type="㇐c"
-					d="M72.5,49c0.69,0.15,1.45,0.55,2.24,0.46c4.01-0.46,7.39-1.09,9.76-1.21" />
-				<g id="kvg:08208-g8" kvg:element="𦥑" kvg:part="3" kvg:variant="true"
-					kvg:original="臼" kvg:tradForm="true">
+				<g id="kvg:08208-g8">
 					<path id="kvg:08208-s14" kvg:type="㇐"
 						d="M11.75,70.7c4.5,0.8,8.75,0.3,14.75-0.46c14.84-1.87,39.62-4.37,58.38-4.72c3.89-0.07,8.32,0.2,12.12,1.02" />
 				</g>
