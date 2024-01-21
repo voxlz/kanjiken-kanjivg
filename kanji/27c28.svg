@@ -35,22 +35,26 @@ See http://creativecommons.org/licenses/by-sa/3.0/ for more details.
 		kvg:type CDATA #IMPLIED >
 ]>
 <svg xmlns="http://www.w3.org/2000/svg" width="109" height="109" viewBox="0 0 109 109">
-	<g id="kvg:StrokePaths_052fa" style="fill:none;stroke:#000000;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;">
-		<g id="kvg:052fa" kvg:element="勺">
-			<g id="kvg:052fa-g1" kvg:element="勹" kvg:position="top" kvg:radical="general">
-				<g id="kvg:052fa-g2" kvg:element="丿">
-					<path id="kvg:052fa-s1" kvg:type="㇒" d="M41,12.25c0.06,0.9,0.07,2.14-0.38,3.38C36.75,26.5,29.38,39.25,17,48.88" />
-				</g>
-				<path id="kvg:052fa-s2" kvg:type="㇆" d="M36.5,33.5c2.88,1.12,6.19,0.75,9.02,0.25C55.15,32.06,76,28,82.25,27.25c4.97-0.6,7.54,2.3,6.5,7.5c-1.89,9.45-7.08,38.94-17.1,55.13c-5.75,9.3-8.21,8.6-13.15,3.37" />
+	<g id="kvg:StrokePaths_08c55" style="fill:none;stroke:#000000;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;">
+		<g kvg:element="𧰨">
+			<g kvg:element="⿨">
+				<path id="kvg:08c55-s2" kvg:type="㇒" d="M56.65,18.18c0.1,0.55,0.21,1.41-0.2,2.2c-2.37,4.63-15.96,14.8-34.57,21.03" />
+				<path id="kvg:08c55-s3" kvg:type="㇁" d="M46.25,31.5c10,5.5,19.89,36.22,12.08,58.33c-3.33,9.42-9.64,1.12-10.89,0.06" />
+				<path id="kvg:08c55-s4" kvg:type="㇒" d="M49.25,38.25c0.09,0.67,0.18,1.73-0.17,2.69c-2.12,5.67-14.29,18.1-30.94,25.72" />
+				<path id="kvg:08c55-s5" kvg:type="㇒" d="M53.75,52.75c0.1,0.85,0.21,2.19-0.2,3.41C51.19,63.34,37.6,79.1,19,88.75" />
 			</g>
-			<g id="kvg:052fa-g3" kvg:element="丶">
-				<path id="kvg:052fa-s3" kvg:type="㇔" d="M41.5,52.25c4.61,3.21,11.91,13.22,13.06,18.22" />
+			<g kvg:element="く">
+				<path id="kvg:08c55-s6" kvg:type="㇒" d="M80.54,31c0.06,0.45,0.12,1.17-0.11,1.82c-1.38,3.84-9.32,12.27-20.17,17.43" />
+				<path id="kvg:08c55-s7" kvg:type="㇏" d="M59.25,52c4.52,4.56,24.33,26.15,29.25,30.64c1.66,1.52,3.09,2.17,4.75,2.61" />
 			</g>
 		</g>
 	</g>
-	<g id="kvg:StrokeNumbers_052fa" style="font-size:8;fill:#808080">
-		<text transform="matrix(1 0 0 1 32.50 12.50)">1</text>
-		<text transform="matrix(1 0 0 1 42.50 30.50)">2</text>
-		<text transform="matrix(1 0 0 1 33.75 52.50)">3</text>
+	<g id="kvg:StrokeNumbers_08c55" style="font-size:8;fill:#808080">
+		<text transform="matrix(1 0 0 1 38.50 29.50)">1</text>
+		<text transform="matrix(1 0 0 1 54.50 36.13)">2</text>
+		<text transform="matrix(1 0 0 1 41.50 42.50)">3</text>
+		<text transform="matrix(1 0 0 1 45.50 58.50)">4</text>
+		<text transform="matrix(1 0 0 1 83.50 30.13)">5</text>
+		<text transform="matrix(1 0 0 1 69.50 58.50)">6</text>
 	</g>
 </svg>
