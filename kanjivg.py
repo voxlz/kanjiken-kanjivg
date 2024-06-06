@@ -15,6 +15,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from ordered_set import OrderedSet
 from src.kvg.xmlhandler import *
 from src.kvg.utils import PYTHON_VERSION_MAJOR, canonicalId
 
@@ -318,7 +319,7 @@ class KanjisHandler(BasicHandler):
         self.group = None
         self.groups = []
         self.compCpt = {}
-        self.metComponents = set()
+        self.metComponents = OrderedSet([])
 
     def handle_start_kanji(self, attrs):
         if self.kanji is not None:
@@ -423,9 +424,9 @@ class SVGHandler(BasicHandler):
     def __init__(self):
         BasicHandler.__init__(self)
         self.kanjis = {}
-        self.currentKanji = None
+        self.current_kanji = None
         self.groups = []
-        self.metComponents = set()
+        self.met_components = OrderedSet([])
 
     def handle_start_g(self, attrs):
         group = StrokeGr()
@@ -440,8 +441,8 @@ class SVGHandler(BasicHandler):
                 return
             else:
                 raise Exception(f'Invalid root group id type ({str(attrs["id"])})')
-            self.currentKanji = Kanji(*idVariant)
-            self.kanjis[self.currentKanji.code] = self.currentKanji
+            self.current_kanji = Kanji(*idVariant)
+            self.kanjis[self.current_kanji.code] = self.current_kanji
             self.compCpt = {}
         else:
             group.setParent(self.groups[-1])
@@ -473,32 +474,32 @@ class SVGHandler(BasicHandler):
         self.groups.append(group)
 
         if group.element:
-            self.metComponents.add(group.element)
+            self.met_components.add(group.element)
         if group.original:
-            self.metComponents.add(group.original)
+            self.met_components.add(group.original)
 
         if group.number:
             if not group.part:
-                print(f"{self.currentKanji.kId()}: Number specified, but part missing")
+                print(f"{self.current_kanji.kId()}: Number specified, but part missing")
             # The group must exist already
             if group.part > 1:
                 if group.element + str(group.number) not in self.compCpt:
-                    print(f"{self.currentKanji.kId()}: Missing numbered group")
+                    print(f"{self.current_kanji.kId()}: Missing numbered group")
                 elif self.compCpt[group.element + str(group.number)] != group.part - 1:
-                    print(f"{self.currentKanji.kId()}: Incorrectly numbered group")
+                    print(f"{self.current_kanji.kId()}: Incorrectly numbered group")
             elif (group.element + str(group.number)) in self.compCpt:
-                print(f"{self.currentKanji.kId()}: Duplicate numbered group")
+                print(f"{self.current_kanji.kId()}: Duplicate numbered group")
             self.compCpt[group.element + str(group.number)] = group.part
         elif group.part:
             # The group must exist already
             if group.part > 1:
                 if group.element not in self.compCpt:
                     print(
-                        f"{self.currentKanji.kId()}: Incorrectly started multi-part group"
+                        f"{self.current_kanji.kId()}: Incorrectly started multi-part group"
                     )
                 elif self.compCpt[group.element] != group.part - 1:
                     print(
-                        f"{self.currentKanji.kId()}: Incorrectly splitted multi-part group"
+                        f"{self.current_kanji.kId()}: Incorrectly splitted multi-part group"
                     )
             self.compCpt[group.element] = group.part
 
@@ -508,8 +509,8 @@ class SVGHandler(BasicHandler):
         group = self.groups.pop()
         # End of kanji?
         if len(self.groups) == 1:  # index 1 - ignore root group
-            self.currentKanji.strokes = group
-            self.currentKanji = None
+            self.current_kanji.strokes = group
+            self.current_kanji = None
             self.groups = []
 
     def handle_start_path(self, attrs):
