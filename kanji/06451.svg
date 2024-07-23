@@ -48,7 +48,7 @@ See http://creativecommons.org/licenses/by-sa/3.0/ for more details.
 					<path id="kvg:06451-s5" kvg:type="㇕a" d="M46.65,20.82c12.68-1.61,35.37-3.57,43.86-3.57c1.93,0,3.49,2.45,3.49,3.91c0,15.41-0.7,53.07-0.35,74.84" />
 				</g>
 				<g id="kvg:06451-g4" kvg:element="或">
-					<g id="kvg:06451-g5" kvg:element="戈" kvg:part="1">
+					<g id="kvg:06451-g5">
 						<g id="kvg:06451-g6" kvg:element="弋" kvg:part="1">
 							<path id="kvg:06451-s6" kvg:type="㇐" d="M49.75,37.49c0.94,0.34,2.64,0.39,3.6,0.34c9.51-0.45,22.75-3.42,31.21-3.89c1.56-0.09,2.5,0.16,3.29,0.34" />
 						</g>
@@ -61,7 +61,7 @@ See http://creativecommons.org/licenses/by-sa/3.0/ for more details.
 					<g id="kvg:06451-g8" kvg:element="一">
 						<path id="kvg:06451-s10" kvg:type="㇐" d="M51.84,78.44c0.45,0.57,1.35,0.87,2.69,0.12c3.73-2.07,10.45-5.77,14.19-7.84" />
 					</g>
-					<g id="kvg:06451-g9" kvg:element="戈" kvg:part="2">
+					<g id="kvg:06451-g9" kvg:element="⿘">
 						<g id="kvg:06451-g10" kvg:element="弋" kvg:part="2">
 							<path id="kvg:06451-s11" kvg:type="㇂" d="M71.78,23.61c0.62,1.26,0.83,1.61,1,4.32c1.3,21.36,5.23,48.01,12.38,55.76c2.44,2.63,2.73,0.54,2.42-5.04" />
 						</g>

@@ -63,7 +63,7 @@ See http://creativecommons.org/licenses/by-sa/3.0/ for more details.
 					<g id="kvg:09e79-g8" kvg:element="厂" kvg:part="1">
 						<path id="kvg:09e79-s12" kvg:type="㇒" d="M54.03,31.03c0.02,1.33-0.02,3.43-0.04,5.34c-0.16,17.87-2.08,43.6-6.19,51.91" />
 					</g>
-					<g id="kvg:09e79-g9" kvg:element="戈" kvg:part="1">
+					<g id="kvg:09e79-g9">
 						<g id="kvg:09e79-g10" kvg:element="弋" kvg:part="1">
 							<g id="kvg:09e79-g11" kvg:element="厂" kvg:part="2">
 								<path id="kvg:09e79-s13" kvg:type="㇐" d="M51.58,30.44c1.14,0.49,3.23,0.63,4.37,0.49C64,30,77.8,27.75,90.42,26.67c1.89-0.16,3.04-0.26,3.99-0.02" />
@@ -80,7 +80,7 @@ See http://creativecommons.org/licenses/by-sa/3.0/ for more details.
 					<path id="kvg:09e79-s17" kvg:type="㇐b" d="M60.97,74.51c4.36-0.56,5.32-0.72,11.3-1.58" />
 				</g>
 				<g id="kvg:09e79-g14" kvg:element="戍" kvg:part="2" kvg:variant="true" kvg:original="戌">
-					<g id="kvg:09e79-g15" kvg:element="戈" kvg:part="2">
+					<g id="kvg:09e79-g15" kvg:element="⿘">
 						<g id="kvg:09e79-g16" kvg:element="弋" kvg:part="2">
 							<path id="kvg:09e79-s18" kvg:type="㇂" d="M72.11,10.75c1.26,1.81,1.85,2.31,2.05,6.21c1.62,30.54,8.08,60.76,20.78,77.02c4.08,5.23,4.19,1.44,3.56-6.58" />
 						</g>

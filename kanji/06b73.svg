@@ -49,7 +49,7 @@ See http://creativecommons.org/licenses/by-sa/3.0/ for more details.
 				<g kvg:position="left">
 					<g id="kvg:06b73-g4" kvg:element="厂" kvg:position="left">
 						<path id="kvg:06b73-s5" kvg:type="㇒" d="M23.01,49.94c0.9,0.9,0.96,2.27,0.92,3.96c-0.36,15.76-4.74,39.71-14.12,47.04" />
-						<g id="kvg:06b73-g5" kvg:element="戈" kvg:part="1">
+						<g id="kvg:06b73-g5">
 							<g id="kvg:06b73-g6" kvg:element="弋" kvg:part="1">
 								<path id="kvg:06b73-s6" kvg:type="㇐" d="M20.75,48.98c3.19,0.92,6.79,0.57,10.01,0.06c11.99-1.92,26.07-3.63,38.22-4.86C72.4,43.83,75.6,43.61,79,44.2" />
 							</g>
