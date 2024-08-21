@@ -45,9 +45,7 @@ See http://creativecommons.org/licenses/by-sa/3.0/ for more details.
 			</g>
 			<g id="kvg:080f8-g2" kvg:element="匈" kvg:position="right" kvg:phon="匈">
 				<g id="kvg:080f8-g3" kvg:element="勹" kvg:position="top">
-					<g id="kvg:080f8-g4" kvg:element="丿">
-						<path id="kvg:080f8-s5" kvg:type="㇒" d="M59.1,16c0.09,1.37,0,2.36-0.5,3.65c-2.29,5.89-6.5,13.56-14.81,22.73" />
-					</g>
+					<path id="kvg:080f8-s5" kvg:type="㇒" d="M59.1,16c0.09,1.37,0,2.36-0.5,3.65c-2.29,5.89-6.5,13.56-14.81,22.73" />
 					<path id="kvg:080f8-s6" kvg:type="㇆" d="M56.35,29.78c1.78,0.6,4.08,0.72,5.96,0.23c1.89-0.48,23.31-3.59,28.03-3.83c4.71-0.24,6.91,1.14,6.45,6.24C95,52.38,92.12,73.12,85.34,91.09c-1.83,4.84-6.01,2.06-8.79-0.96" />
 				</g>
 				<g id="kvg:080f8-g5" kvg:element="凶" kvg:position="bottom">
