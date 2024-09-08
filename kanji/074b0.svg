@@ -37,7 +37,8 @@ See http://creativecommons.org/licenses/by-sa/3.0/ for more details.
 <svg xmlns="http://www.w3.org/2000/svg" width="109" height="109" viewBox="0 0 109 109">
 	<g id="kvg:StrokePaths_074b0" style="fill:none;stroke:#000000;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;">
 		<g id="kvg:074b0" kvg:element="環">
-			<g id="kvg:074b0-g1" kvg:element="𤣩" kvg:position="left" kvg:radical="general">
+			<!-- TILTED COMPONENT -->
+			<g id="kvg:074b0-g1" kvg:element="王" kvg:position="left" kvg:radical="general">
 				<path id="kvg:074b0-s1" kvg:type="㇐" d="M13.25,26.66c2.38,0.84,4.83,0.7,6.76,0.43c3.83-0.52,10.16-1.73,15.06-2.14c0.86-0.07,2.46-0.25,3.18,0.04" />
 				<path id="kvg:074b0-s2" kvg:type="㇑a" d="M26.07,29.34c0.92,0.92,1.23,2.29,1.23,3.35c0,5.72-0.05,34.41-0.05,40.31" />
 				<path id="kvg:074b0-s3" kvg:type="㇐" d="M13,51.17c1.88,0.71,3.46,0.51,5.01,0.36C22,51.12,29.62,49.5,35,48.49c0.68-0.13,2.22-0.41,3.25-0.07" />
